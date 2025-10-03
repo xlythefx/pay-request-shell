@@ -49,11 +49,20 @@ type OtherWorkData = {
 };
 
 const addHeader = (doc: jsPDF, title: string) => {
-  doc.setFillColor(41, 128, 185);
-  doc.rect(0, 0, doc.internal.pageSize.width, 40, "F");
+  // Teal background from design system (172 30% 57%)
+  doc.setFillColor(111, 182, 173);
+  doc.rect(0, 0, doc.internal.pageSize.width, 50, "F");
+  
+  // Company name and logo area
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
-  doc.text(title, 20, 25);
+  doc.setFontSize(16);
+  doc.setFont(undefined, "bold");
+  doc.text("Payment Request System", 20, 20);
+  
+  // Document title
+  doc.setFontSize(14);
+  doc.setFont(undefined, "normal");
+  doc.text(title, 20, 35);
 };
 
 const addFooter = (doc: jsPDF) => {
@@ -79,7 +88,7 @@ export const generateLinkBuildingPDF = (data: LinkBuildingData) => {
   doc.setFontSize(12);
 
   // Invoice details
-  let yPos = 50;
+  let yPos = 60;
   doc.text(`Vendor Name: ${data.vendorName}`, 20, yPos);
   yPos += 10;
   doc.text(`Invoice Number: ${data.invoiceNumber}`, 20, yPos);
@@ -108,7 +117,7 @@ export const generateLinkBuildingPDF = (data: LinkBuildingData) => {
     head: [["Type", "Client/Project", "Description", "Amount"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [41, 128, 185] },
+    headStyles: { fillColor: [111, 182, 173] },
   });
 
   // Total
@@ -148,7 +157,7 @@ export const generateSalaryPDF = (data: SalaryData) => {
   doc.setFontSize(12);
 
   // Employee details
-  let yPos = 50;
+  let yPos = 60;
   doc.text(`Employee Name: ${data.employeeName}`, 20, yPos);
   yPos += 10;
   doc.text(`Position: ${data.position}`, 20, yPos);
@@ -173,7 +182,7 @@ export const generateSalaryPDF = (data: SalaryData) => {
     head: [["Description", "Amount"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [41, 128, 185] },
+    headStyles: { fillColor: [111, 182, 173] },
   });
 
   // Total
@@ -213,7 +222,7 @@ export const generateToolsPDF = (data: ToolsData) => {
   doc.setFontSize(12);
 
   // Tool details
-  let yPos = 50;
+  let yPos = 60;
   doc.text(`Tool Name: ${data.toolName}`, 20, yPos);
   yPos += 10;
   doc.text(`Tool Category: ${data.toolCategory}`, 20, yPos);
@@ -234,7 +243,7 @@ export const generateToolsPDF = (data: ToolsData) => {
     head: [["Description", "Amount"]],
     body: tableData,
     theme: "grid",
-    headStyles: { fillColor: [41, 128, 185] },
+    headStyles: { fillColor: [111, 182, 173] },
   });
 
   // Total
@@ -274,7 +283,7 @@ export const generateOtherWorkPDF = (data: OtherWorkData) => {
   doc.setFontSize(12);
 
   // Work details
-  let yPos = 50;
+  let yPos = 60;
   doc.text(`Vendor Name: ${data.vendorName}`, 20, yPos);
   yPos += 10;
   doc.text(`Invoice Number: ${data.invoiceNumber}`, 20, yPos);

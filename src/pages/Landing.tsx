@@ -149,8 +149,8 @@ export default function Landing() {
                 <p className="text-muted-foreground">Average Processing Time</p>
               </div>
               <div>
-                <h3 className="text-5xl font-bold gradient-text mb-2">500+</h3>
-                <p className="text-muted-foreground">Companies Trust Us</p>
+                <h3 className="text-5xl font-bold gradient-text mb-2">60%</h3>
+                <p className="text-muted-foreground">Reduction in Payment Processing Time</p>
               </div>
             </div>
           </div>

@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 const roleOptions = [
   { value: "employee", label: "Employee" },
   { value: "finance_manager", label: "Finance Manager" },
+  { value: "manager", label: "Manager" },
   { value: "admin", label: "Administrator" },
 ];
 
@@ -71,6 +72,8 @@ export default function AdminUsers() {
     switch (role) {
       case "admin":
         return "bg-error/20 text-error border-error/50";
+      case "manager":
+        return "bg-primary/20 text-primary border-primary/50";
       case "finance_manager":
         return "bg-warning/20 text-warning border-warning/50";
       default:

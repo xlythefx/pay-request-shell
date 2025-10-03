@@ -189,19 +189,19 @@ export default function SystemSettings() {
         >
           <Tabs defaultValue="departments" className="w-full">
             <TabsList className="grid w-full grid-cols-4 mb-6" style={{ backgroundColor: '#C38E32' }}>
-              <TabsTrigger value="departments" className="flex items-center gap-2 data-[state=inactive]:text-[#0F1215]">
+              <TabsTrigger value="departments" className="flex items-center gap-2 border border-border/50 data-[state=inactive]:text-[#0F1215]">
                 <Building className="h-4 w-4" />
                 Departments
               </TabsTrigger>
-              <TabsTrigger value="roles" className="flex items-center gap-2 data-[state=inactive]:text-[#0F1215]">
+              <TabsTrigger value="roles" className="flex items-center gap-2 border border-border/50 data-[state=inactive]:text-[#0F1215]">
                 <Shield className="h-4 w-4" />
                 Roles
               </TabsTrigger>
-              <TabsTrigger value="templates" className="flex items-center gap-2 data-[state=inactive]:text-[#0F1215]">
+              <TabsTrigger value="templates" className="flex items-center gap-2 border border-border/50 data-[state=inactive]:text-[#0F1215]">
                 <FileText className="h-4 w-4" />
                 Templates
               </TabsTrigger>
-              <TabsTrigger value="company" className="flex items-center gap-2 data-[state=inactive]:text-[#0F1215]">
+              <TabsTrigger value="company" className="flex items-center gap-2 border border-border/50 data-[state=inactive]:text-[#0F1215]">
                 <Image className="h-4 w-4" />
                 Company Info
               </TabsTrigger>

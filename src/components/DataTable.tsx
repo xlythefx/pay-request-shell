@@ -86,12 +86,12 @@ export function DataTable<T extends Record<string, any>>({
           <TableHeader>
             <TableRow className="bg-card">
               {columns.map((column) => (
-                <TableHead key={column.key} className="text-foreground font-semibold hover:bg-[hsl(var(--table-header-hover))] transition-colors">
+                <TableHead key={column.key} className="text-foreground font-semibold">
                   {column.sortable ? (
                     <Button
                       variant="ghost"
                       onClick={() => handleSort(column.key)}
-                      className="flex items-center gap-2 hover:bg-transparent hover:text-background"
+                      className="flex items-center gap-2 hover:bg-transparent"
                     >
                       {column.label}
                       <ArrowUpDown className="h-3 w-3" />

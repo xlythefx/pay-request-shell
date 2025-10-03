@@ -5,12 +5,24 @@ import { LogOut, LayoutDashboard, FileText, Users } from "lucide-react";
 import { getAuth, clearAuth } from "@/lib/auth";
 import { authAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = getAuth();
   const { toast } = useToast();
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const handleLogout = async () => {
     await authAPI.logout();
@@ -19,6 +31,11 @@ export const Navbar = () => {
       title: "Logged out successfully",
     });
     navigate("/login");
+  };
+
+  const confirmLogout = () => {
+    setShowLogoutDialog(false);
+    handleLogout();
   };
 
   if (!user) return null;
@@ -65,12 +82,27 @@ export const Navbar = () => {
               <p className="text-sm font-medium text-foreground">{user.name}</p>
               <p className="text-xs text-muted-foreground capitalize">{user.role.replace("_", " ")}</p>
             </div>
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button variant="ghost" size="icon" onClick={() => setShowLogoutDialog(true)}>
               <LogOut className="h-4 w-4" />
             </Button>
           </div>
         </div>
       </div>
+
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to log out? You will need to sign in again to access your account.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.nav>
   );
 };

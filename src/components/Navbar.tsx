@@ -42,13 +42,16 @@ export const Navbar = () => {
   if (!user) return null;
 
   const navItems = [
-    { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, roles: ["employee", "finance_manager", "admin"] },
-    { label: "Requests", path: "/requests", icon: FileText, roles: ["employee", "finance_manager", "admin"] },
-    { label: "Department", path: "/department", icon: FileText, roles: ["finance_manager"] },
-    { label: "Users", path: "/admin/users", icon: Users, roles: ["admin"] },
+    { label: "Dashboard", path: "/dashboard", icon: LayoutDashboard, roles: ["employee", "finance_manager", "manager", "admin"] },
+    { label: "Requests", path: "/requests", icon: FileText, roles: ["employee", "finance_manager", "manager", "admin"] },
+    { label: "Department", path: "/department", icon: FileText, roles: ["finance_manager", "manager"] },
+    { label: "Users", path: "/admin/users", icon: Users, roles: ["manager", "admin"] },
   ];
 
   const visibleItems = navItems.filter((item) => item.roles.includes(user.role));
+
+  console.log('Current user role:', user.role);
+  console.log('Visible nav items for role:', visibleItems);
 
   const handleLinkClick = () => {
     setMobileMenuOpen(false);

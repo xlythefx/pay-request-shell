@@ -8,6 +8,7 @@ import { BackgroundAnimation } from "@/components/BackgroundAnimation";
 import { ArrowRight, CheckCircle, Shield, Zap } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import heroImage from "@/assets/hero-corporate.jpg";
+import logoImage from "@/assets/feature-digital-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
@@ -46,8 +47,18 @@ export default function Landing() {
     <div className="min-h-screen">
       <BackgroundAnimation />
       
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center gap-3">
+            <img src={logoImage} alt="Feature Digital LTD logo" className="h-10 w-10" />
+            <span className="text-xl font-bold">Feature Digital LTD</span>
+          </div>
+        </div>
+      </header>
+      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
         <div className="container mx-auto px-4 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -71,9 +82,6 @@ export default function Landing() {
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
-                <Button variant="outline" size="lg">
-                  Learn More
-                </Button>
               </div>
             </motion.div>
 

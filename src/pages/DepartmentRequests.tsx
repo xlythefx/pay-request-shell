@@ -113,9 +113,18 @@ export default function DepartmentRequests() {
       ];
 
       const { user } = getAuth();
-      const departmentRequests = user?.department 
-        ? mockRequests.filter((req: any) => req.department === user.department)
-        : mockRequests;
+      
+      // Manager can see all departments' requests
+      let departmentRequests;
+      if (user?.role === 'manager') {
+        departmentRequests = mockRequests;
+        console.log('Manager viewing all departments:', mockRequests.length, 'requests');
+      } else {
+        departmentRequests = user?.department 
+          ? mockRequests.filter((req: any) => req.department === user.department)
+          : mockRequests;
+        console.log('Filtered by department:', user?.department, '-', departmentRequests.length, 'requests');
+      }
       
       setRequests(departmentRequests);
     } catch (error) {
@@ -129,8 +138,12 @@ export default function DepartmentRequests() {
     const { user } = getAuth();
     if (!user) return;
 
+    const reportDepartment = user.role === 'manager' 
+      ? "All Departments" 
+      : user.department || "Unknown Department";
+
     generateDepartmentReportPDF({
-      department: user.department || "Unknown Department",
+      department: reportDepartment,
       generatedBy: user.name,
       generatedAt: new Date().toISOString(),
       companyName: "Digital Payment System",
@@ -227,6 +240,16 @@ export default function DepartmentRequests() {
       sortable: true,
     },
     {
+      key: "department",
+      label: "Department",
+      render: (value) => (
+        <span className="px-2 py-1 bg-accent/20 text-accent rounded-md text-xs font-medium">
+          {value}
+        </span>
+      ),
+      sortable: true,
+    },
+    {
       key: "createdAt",
       label: "Date",
       render: (value) => new Date(value).toLocaleDateString(),
@@ -283,7 +306,9 @@ export default function DepartmentRequests() {
             <div>
               <h1 className="text-4xl font-bold mb-2 gradient-text">Department Requests</h1>
               <p className="text-muted-foreground text-lg">
-                Review and manage payment requests from your department
+                {getAuth().user?.role === 'manager' 
+                  ? "Review and manage payment requests from all departments"
+                  : "Review and manage payment requests from your department"}
               </p>
             </div>
             <Button onClick={handleGenerateReport} disabled={loading || requests.length === 0}>

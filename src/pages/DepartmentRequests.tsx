@@ -28,13 +28,55 @@ export default function DepartmentRequests() {
 
   const loadRequests = async () => {
     try {
+      // Mock data for UI demonstration
+      const mockRequests = [
+        {
+          id: "REQ-001",
+          type: "vendor_payment",
+          vendorName: "ABC Supplies Inc.",
+          totalAmount: 15000,
+          currency: "USD",
+          status: "pending",
+          createdAt: new Date("2025-09-28").toISOString(),
+          department: "Marketing",
+        },
+        {
+          id: "REQ-002",
+          type: "employee_reimbursement",
+          employeeName: "Sarah Johnson",
+          totalAmount: 450,
+          currency: "USD",
+          status: "pending",
+          createdAt: new Date("2025-09-29").toISOString(),
+          department: "Marketing",
+        },
+        {
+          id: "REQ-003",
+          type: "digital_tool_subscription",
+          toolName: "Adobe Creative Cloud",
+          totalAmount: 2400,
+          currency: "USD",
+          status: "approved",
+          createdAt: new Date("2025-09-27").toISOString(),
+          department: "Marketing",
+        },
+        {
+          id: "REQ-004",
+          type: "vendor_payment",
+          vendorName: "Tech Solutions Ltd.",
+          totalAmount: 8500,
+          currency: "USD",
+          status: "pending",
+          createdAt: new Date("2025-09-30").toISOString(),
+          department: "IT",
+        },
+      ];
+
       const { user } = getAuth();
-      const response = await requestsAPI.getAll();
-      // Filter requests by department for finance managers
-      const allRequests = response.data || [];
       const departmentRequests = user?.department 
-        ? allRequests.filter((req: any) => req.department === user.department)
-        : allRequests;
+        ? mockRequests.filter((req: any) => req.department === user.department)
+        : mockRequests;
+      
       setRequests(departmentRequests);
     } catch (error) {
       console.error("Failed to load requests", error);

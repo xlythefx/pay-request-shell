@@ -13,6 +13,15 @@ import { Plus, Trash2, ArrowLeft, FileDown } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { generateLinkBuildingPDF, generateSalaryPDF, generateToolsPDF, generateOtherWorkPDF } from "@/lib/pdfGenerator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 type TemplateType = "link_building" | "salary" | "tools" | "other_work";
 
@@ -60,6 +69,9 @@ export default function CreateRequest() {
   const { toast } = useToast();
   const [template, setTemplate] = useState<TemplateType | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showValidationError, setShowValidationError] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set());
 
   // Template notes (for displaying on the right side of template titles)
   const [templateNote, setTemplateNote] = useState("");
@@ -239,8 +251,148 @@ export default function CreateRequest() {
     }
   };
 
+  const validateForm = (): boolean => {
+    const errors: string[] = [];
+    const allFields = new Set<string>();
+
+    if (template === "link_building") {
+      if (!linkBuildingData.vendorName) {
+        errors.push("Vendor Name is required");
+        allFields.add("vendorName");
+      }
+      if (!linkBuildingData.invoiceNumber) {
+        errors.push("Invoice Number is required");
+        allFields.add("invoiceNumber");
+      }
+      if (!linkBuildingData.file) {
+        errors.push("Invoice file is required");
+        allFields.add("file");
+      }
+      linkBuildingData.items.forEach((item, index) => {
+        if (!item.clientProjectType) {
+          errors.push(`Line item ${index + 1}: Type is required`);
+          allFields.add(`item-${index}-type`);
+        }
+        if (item.clientProjectType === "client" && !item.selectedClientProject) {
+          errors.push(`Line item ${index + 1}: Client is required`);
+          allFields.add(`item-${index}-client`);
+        }
+        if (item.clientProjectType === "project" && !item.selectedClientProject) {
+          errors.push(`Line item ${index + 1}: Project is required`);
+          allFields.add(`item-${index}-project`);
+        }
+        if (item.clientProjectType === "other" && !item.customValue) {
+          errors.push(`Line item ${index + 1}: Custom value is required`);
+          allFields.add(`item-${index}-custom`);
+        }
+        if (!item.description) {
+          errors.push(`Line item ${index + 1}: Description is required`);
+          allFields.add(`item-${index}-description`);
+        }
+        if (!item.amount || parseFloat(item.amount) < 1) {
+          errors.push(`Line item ${index + 1}: Valid amount is required (min: 1)`);
+          allFields.add(`item-${index}-amount`);
+        }
+      });
+    } else if (template === "salary") {
+      if (!salaryData.employeeName) {
+        errors.push("Employee Name is required");
+        allFields.add("employeeName");
+      }
+      if (!salaryData.invoiceNumber) {
+        errors.push("Invoice Number is required");
+        allFields.add("invoiceNumber");
+      }
+      if (!salaryData.position) {
+        errors.push("Position is required");
+        allFields.add("position");
+      }
+      if (!salaryData.paymentMethod) {
+        errors.push("Payment Method is required");
+        allFields.add("paymentMethod");
+      }
+      salaryData.items.forEach((item, index) => {
+        if (!item.description) {
+          errors.push(`Salary item ${index + 1}: Description is required`);
+          allFields.add(`salary-item-${index}-description`);
+        }
+        if (!item.amount || parseFloat(item.amount) < 1) {
+          errors.push(`Salary item ${index + 1}: Valid amount is required (min: 1)`);
+          allFields.add(`salary-item-${index}-amount`);
+        }
+      });
+    } else if (template === "tools") {
+      if (!toolsData.toolName) {
+        errors.push("Tool Name is required");
+        allFields.add("toolName");
+      }
+      if (!toolsData.toolCategory) {
+        errors.push("Tool Category is required");
+        allFields.add("toolCategory");
+      }
+      if (!toolsData.paymentFrequency) {
+        errors.push("Payment Frequency is required");
+        allFields.add("paymentFrequency");
+      }
+      toolsData.items.forEach((item, index) => {
+        if (!item.description) {
+          errors.push(`Tool item ${index + 1}: Description is required`);
+          allFields.add(`tool-item-${index}-description`);
+        }
+        if (!item.amount || parseFloat(item.amount) < 1) {
+          errors.push(`Tool item ${index + 1}: Valid amount is required (min: 1)`);
+          allFields.add(`tool-item-${index}-amount`);
+        }
+      });
+    } else if (template === "other_work") {
+      if (!otherWorkData.vendorName) {
+        errors.push("Vendor Name is required");
+        allFields.add("otherVendorName");
+      }
+      if (!otherWorkData.invoiceNumber) {
+        errors.push("Invoice Number is required");
+        allFields.add("otherInvoiceNumber");
+      }
+      if (!otherWorkData.workCategory) {
+        errors.push("Work Category is required");
+        allFields.add("workCategory");
+      }
+      if (!otherWorkData.clientProjectType) {
+        errors.push("Client/Project Type is required");
+        allFields.add("otherClientProjectType");
+      }
+      if (!otherWorkData.description) {
+        errors.push("Description is required");
+        allFields.add("otherDescription");
+      }
+      if (!otherWorkData.amount || parseFloat(otherWorkData.amount) < 1) {
+        errors.push("Valid amount is required (min: 1)");
+        allFields.add("otherAmount");
+      }
+      if (!otherWorkData.file) {
+        errors.push("Invoice file is required");
+        allFields.add("otherFile");
+      }
+    }
+
+    setValidationErrors(errors);
+    setTouchedFields(allFields);
+    
+    if (errors.length > 0) {
+      setShowValidationError(true);
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -375,12 +527,14 @@ export default function CreateRequest() {
                         required
                         value={linkBuildingData.vendorName}
                         onChange={(e) => setLinkBuildingData({...linkBuildingData, vendorName: e.target.value})}
+                        error={touchedFields.has("vendorName") && !linkBuildingData.vendorName ? "Required" : undefined}
                       />
                       <FormInput
                         label="Invoice Number"
                         required
                         value={linkBuildingData.invoiceNumber}
                         onChange={(e) => setLinkBuildingData({...linkBuildingData, invoiceNumber: e.target.value})}
+                        error={touchedFields.has("invoiceNumber") && !linkBuildingData.invoiceNumber ? "Required" : undefined}
                       />
                       <FormInput
                         label="Invoice Date"
@@ -414,6 +568,7 @@ export default function CreateRequest() {
                                 newItems[index].customValue = "";
                                 setLinkBuildingData({...linkBuildingData, items: newItems});
                               }}
+                              error={touchedFields.has(`item-${index}-type`) && !item.clientProjectType ? "Required" : undefined}
                             />
                             
                             <div>
@@ -428,6 +583,7 @@ export default function CreateRequest() {
                                     newItems[index].selectedClientProject = value;
                                     setLinkBuildingData({...linkBuildingData, items: newItems});
                                   }}
+                                  error={touchedFields.has(`item-${index}-client`) && !item.selectedClientProject ? "Required" : undefined}
                                 />
                               )}
                               
@@ -442,6 +598,7 @@ export default function CreateRequest() {
                                     newItems[index].selectedClientProject = value;
                                     setLinkBuildingData({...linkBuildingData, items: newItems});
                                   }}
+                                  error={touchedFields.has(`item-${index}-project`) && !item.selectedClientProject ? "Required" : undefined}
                                 />
                               )}
                               
@@ -455,6 +612,7 @@ export default function CreateRequest() {
                                     newItems[index].customValue = e.target.value;
                                     setLinkBuildingData({...linkBuildingData, items: newItems});
                                   }}
+                                  error={touchedFields.has(`item-${index}-custom`) && !item.customValue ? "Required" : undefined}
                                 />
                               )}
                               
@@ -480,6 +638,7 @@ export default function CreateRequest() {
                                 newItems[index].description = e.target.value;
                                 setLinkBuildingData({...linkBuildingData, items: newItems});
                               }}
+                              error={touchedFields.has(`item-${index}-description`) && !item.description ? "Required" : undefined}
                             />
                             <FormInput
                               type="number"
@@ -490,7 +649,11 @@ export default function CreateRequest() {
                                 newItems[index].amount = e.target.value;
                                 setLinkBuildingData({...linkBuildingData, items: newItems});
                               }}
-                              error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
+                              error={
+                                touchedFields.has(`item-${index}-amount`) && (!item.amount || parseFloat(item.amount) < 1)
+                                  ? !item.amount ? "Required" : "Amount must be at least 1"
+                                  : item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined
+                              }
                             />
                             {linkBuildingData.items.length > 1 && (
                               <Button
@@ -556,12 +719,14 @@ export default function CreateRequest() {
                             position: selectedEmployee?.position || ""
                           });
                         }}
+                        error={touchedFields.has("employeeName") && !salaryData.employeeName ? "Required" : undefined}
                       />
                       <FormInput
                         label="Invoice Number"
                         required
                         value={salaryData.invoiceNumber}
                         onChange={(e) => setSalaryData({...salaryData, invoiceNumber: e.target.value})}
+                        error={touchedFields.has("invoiceNumber") && !salaryData.invoiceNumber ? "Required" : undefined}
                       />
                       <FormInput
                         label="Date"
@@ -584,6 +749,7 @@ export default function CreateRequest() {
                       required
                       value={salaryData.position}
                       onChange={(e) => setSalaryData({...salaryData, position: e.target.value})}
+                      error={touchedFields.has("position") && !salaryData.position ? "Required" : undefined}
                     />
 
                     <div className="space-y-4">
@@ -604,6 +770,7 @@ export default function CreateRequest() {
                               newItems[index].description = e.target.value;
                               setSalaryData({...salaryData, items: newItems});
                             }}
+                            error={touchedFields.has(`salary-item-${index}-description`) && !item.description ? "Required" : undefined}
                           />
                           <FormInput
                             type="number"
@@ -614,7 +781,11 @@ export default function CreateRequest() {
                               newItems[index].amount = e.target.value;
                               setSalaryData({...salaryData, items: newItems});
                             }}
-                            error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
+                            error={
+                              touchedFields.has(`salary-item-${index}-amount`) && (!item.amount || parseFloat(item.amount) < 1)
+                                ? !item.amount ? "Required" : "Amount must be at least 1"
+                                : item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined
+                            }
                           />
                           {salaryData.items.length > 1 && (
                             <Button
@@ -651,6 +822,7 @@ export default function CreateRequest() {
                       required
                       value={salaryData.paymentMethod}
                       onChange={(e) => setSalaryData({...salaryData, paymentMethod: e.target.value})}
+                      error={touchedFields.has("paymentMethod") && !salaryData.paymentMethod ? "Required" : undefined}
                     />
 
                     <FileUploader
@@ -669,12 +841,14 @@ export default function CreateRequest() {
                         required
                         value={toolsData.toolName}
                         onChange={(e) => setToolsData({...toolsData, toolName: e.target.value})}
+                        error={touchedFields.has("toolName") && !toolsData.toolName ? "Required" : undefined}
                       />
                       <FormInput
                         label="Tool Category"
                         required
                         value={toolsData.toolCategory}
                         onChange={(e) => setToolsData({...toolsData, toolCategory: e.target.value})}
+                        error={touchedFields.has("toolCategory") && !toolsData.toolCategory ? "Required" : undefined}
                       />
                       <FormSelect
                         label="Payment Frequency"
@@ -687,6 +861,7 @@ export default function CreateRequest() {
                         ]}
                         value={toolsData.paymentFrequency}
                         onValueChange={(value) => setToolsData({...toolsData, paymentFrequency: value})}
+                        error={touchedFields.has("paymentFrequency") && !toolsData.paymentFrequency ? "Required" : undefined}
                       />
                     </div>
 
@@ -709,6 +884,7 @@ export default function CreateRequest() {
                                 newItems[index].description = e.target.value;
                                 setToolsData({...toolsData, items: newItems});
                               }}
+                              error={touchedFields.has(`tool-item-${index}-description`) && !item.description ? "Required" : undefined}
                             />
                             <FormInput
                               type="number"
@@ -719,7 +895,11 @@ export default function CreateRequest() {
                                 newItems[index].amount = e.target.value;
                                 setToolsData({...toolsData, items: newItems});
                               }}
-                              error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
+                              error={
+                                touchedFields.has(`tool-item-${index}-amount`) && (!item.amount || parseFloat(item.amount) < 1)
+                                  ? !item.amount ? "Required" : "Amount must be at least 1"
+                                  : item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined
+                              }
                             />
                             {toolsData.items.length > 1 && (
                               <Button
@@ -774,12 +954,14 @@ export default function CreateRequest() {
                         required
                         value={otherWorkData.vendorName}
                         onChange={(e) => setOtherWorkData({...otherWorkData, vendorName: e.target.value})}
+                        error={touchedFields.has("otherVendorName") && !otherWorkData.vendorName ? "Required" : undefined}
                       />
                       <FormInput
                         label="Invoice Number"
                         required
                         value={otherWorkData.invoiceNumber}
                         onChange={(e) => setOtherWorkData({...otherWorkData, invoiceNumber: e.target.value})}
+                        error={touchedFields.has("otherInvoiceNumber") && !otherWorkData.invoiceNumber ? "Required" : undefined}
                       />
                       <FormInput
                         label="Invoice Date"
@@ -795,6 +977,7 @@ export default function CreateRequest() {
                       required
                       value={otherWorkData.workCategory}
                       onChange={(e) => setOtherWorkData({...otherWorkData, workCategory: e.target.value})}
+                      error={touchedFields.has("workCategory") && !otherWorkData.workCategory ? "Required" : undefined}
                     />
 
                     <FormInput
@@ -803,6 +986,7 @@ export default function CreateRequest() {
                       placeholder="Enter client or project type"
                       value={otherWorkData.clientProjectType}
                       onChange={(e) => setOtherWorkData({...otherWorkData, clientProjectType: e.target.value})}
+                      error={touchedFields.has("otherClientProjectType") && !otherWorkData.clientProjectType ? "Required" : undefined}
                     />
 
                     <div className="grid md:grid-cols-3 gap-4">
@@ -812,6 +996,7 @@ export default function CreateRequest() {
                           required
                           value={otherWorkData.description}
                           onChange={(e) => setOtherWorkData({...otherWorkData, description: e.target.value})}
+                          error={touchedFields.has("otherDescription") && !otherWorkData.description ? "Required" : undefined}
                         />
                       </div>
                       <FormInput
@@ -820,7 +1005,11 @@ export default function CreateRequest() {
                         required
                         value={otherWorkData.amount}
                         onChange={(e) => setOtherWorkData({...otherWorkData, amount: e.target.value})}
-                        error={otherWorkData.amount && parseFloat(otherWorkData.amount) < 1 ? "Amount must be at least 1" : undefined}
+                        error={
+                          touchedFields.has("otherAmount") && (!otherWorkData.amount || parseFloat(otherWorkData.amount) < 1)
+                            ? !otherWorkData.amount ? "Required" : "Amount must be at least 1"
+                            : otherWorkData.amount && parseFloat(otherWorkData.amount) < 1 ? "Amount must be at least 1" : undefined
+                        }
                       />
                     </div>
 
@@ -871,6 +1060,27 @@ export default function CreateRequest() {
           </Card>
         </motion.div>
       </div>
+      
+      <AlertDialog open={showValidationError} onOpenChange={setShowValidationError}>
+        <AlertDialogContent className="max-h-[80vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-destructive">Required Fields Missing</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>Please complete all required fields before submitting:</p>
+              <ul className="list-disc list-inside space-y-1 mt-3">
+                {validationErrors.map((error, index) => (
+                  <li key={index} className="text-sm text-foreground">{error}</li>
+                ))}
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowValidationError(false)}>
+              Got it
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

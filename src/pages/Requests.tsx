@@ -6,11 +6,14 @@ import { BackgroundAnimation } from "@/components/BackgroundAnimation";
 import { DataTable, Column } from "@/components/DataTable";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, FileDown } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
+import { generateLinkBuildingPDF, generateSalaryPDF, generateToolsPDF, generateOtherWorkPDF } from "@/lib/pdfGenerator";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Requests() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -26,6 +29,31 @@ export default function Requests() {
       console.error("Failed to load requests", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGeneratePDF = (e: React.MouseEvent, request: any) => {
+    e.stopPropagation(); // Prevent row click
+    try {
+      if (request.type === "link_building") {
+        generateLinkBuildingPDF(request);
+      } else if (request.type === "salary") {
+        generateSalaryPDF(request);
+      } else if (request.type === "tools") {
+        generateToolsPDF(request);
+      } else if (request.type === "other_work") {
+        generateOtherWorkPDF(request);
+      }
+      toast({
+        title: "PDF Generated",
+        description: "Your PDF has been downloaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "PDF Generation Failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
     }
   };
 
@@ -75,6 +103,21 @@ export default function Requests() {
       label: "Date",
       render: (value) => new Date(value).toLocaleDateString(),
       sortable: true,
+    },
+    {
+      key: "actions",
+      label: "Actions",
+      render: (_, row) => (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => handleGeneratePDF(e, row)}
+          className="gap-2"
+        >
+          <FileDown className="h-4 w-4" />
+          PDF
+        </Button>
+      ),
     },
   ];
 

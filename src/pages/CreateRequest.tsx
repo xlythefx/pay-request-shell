@@ -42,11 +42,11 @@ const mockProjects = [
 ];
 
 const mockEmployees = [
-  { value: "emp1", label: "John Smith", address: "123 Main Street, New York, NY 10001" },
-  { value: "emp2", label: "Sarah Johnson", address: "456 Oak Avenue, Los Angeles, CA 90012" },
-  { value: "emp3", label: "Michael Chen", address: "789 Elm Street, Chicago, IL 60601" },
-  { value: "emp4", label: "Emily Davis", address: "321 Pine Road, Houston, TX 77002" },
-  { value: "emp5", label: "David Wilson", address: "654 Maple Drive, Miami, FL 33101" },
+  { value: "emp1", label: "John Smith", address: "123 Main Street, New York, NY 10001", position: "Senior Developer" },
+  { value: "emp2", label: "Sarah Johnson", address: "456 Oak Avenue, Los Angeles, CA 90012", position: "Marketing Manager" },
+  { value: "emp3", label: "Michael Chen", address: "789 Elm Street, Chicago, IL 60601", position: "UI/UX Designer" },
+  { value: "emp4", label: "Emily Davis", address: "321 Pine Road, Houston, TX 77002", position: "Content Writer" },
+  { value: "emp5", label: "David Wilson", address: "654 Maple Drive, Miami, FL 33101", position: "SEO Specialist" },
 ];
 
 const getTodayDate = () => {
@@ -472,7 +472,8 @@ export default function CreateRequest() {
                           setSalaryData({
                             ...salaryData, 
                             employeeName: value,
-                            employeeAddress: selectedEmployee?.address || ""
+                            employeeAddress: selectedEmployee?.address || "",
+                            position: selectedEmployee?.position || ""
                           });
                         }}
                       />

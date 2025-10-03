@@ -92,12 +92,14 @@ export default function CreateRequest() {
 
   // Tools Template
   const [toolsData, setToolsData] = useState({
-    toolName: "",
-    toolCategory: "",
-    paymentFrequency: "",
-    description: "",
-    amount: "",
     currency: "USD",
+    items: [{ 
+      toolName: "", 
+      toolCategory: "", 
+      paymentFrequency: "", 
+      description: "", 
+      amount: "" 
+    }],
     note: "",
     file: null as File | null,
   });
@@ -166,6 +168,17 @@ export default function CreateRequest() {
         ...salaryData,
         items: [...salaryData.items, { description: "", amount: "" }],
       });
+    } else if (templateType === "tools") {
+      setToolsData({
+        ...toolsData,
+        items: [...toolsData.items, { 
+          toolName: "", 
+          toolCategory: "", 
+          paymentFrequency: "", 
+          description: "", 
+          amount: "" 
+        }],
+      });
     }
   };
 
@@ -180,6 +193,11 @@ export default function CreateRequest() {
         ...salaryData,
         items: salaryData.items.filter((_, i) => i !== index),
       });
+    } else if (templateType === "tools") {
+      setToolsData({
+        ...toolsData,
+        items: toolsData.items.filter((_, i) => i !== index),
+      });
     }
   };
 
@@ -189,7 +207,7 @@ export default function CreateRequest() {
     } else if (template === "salary") {
       return salaryData.items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
     } else if (template === "tools") {
-      return parseFloat(toolsData.amount) || 0;
+      return toolsData.items.reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
     } else if (template === "other_work") {
       return parseFloat(otherWorkData.amount) || 0;
     }
@@ -575,55 +593,92 @@ export default function CreateRequest() {
                 {/* Tools Template */}
                 {template === "tools" && (
                   <>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Tool Name"
-                        required
-                        value={toolsData.toolName}
-                        onChange={(e) => setToolsData({...toolsData, toolName: e.target.value})}
-                      />
-                      <FormInput
-                        label="Tool Category"
-                        required
-                        value={toolsData.toolCategory}
-                        onChange={(e) => setToolsData({...toolsData, toolCategory: e.target.value})}
-                      />
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-foreground">Tool Items</h3>
+                        <Button type="button" variant="outline" size="sm" onClick={() => addLineItem("tools")}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Item
+                        </Button>
+                      </div>
+                      {toolsData.items.map((item, index) => (
+                        <div key={index} className="space-y-4 p-4 bg-secondary/50 rounded-lg">
+                          <div className="grid md:grid-cols-3 gap-4">
+                            <FormInput
+                              placeholder="Tool Name"
+                              value={item.toolName}
+                              onChange={(e) => {
+                                const newItems = [...toolsData.items];
+                                newItems[index].toolName = e.target.value;
+                                setToolsData({...toolsData, items: newItems});
+                              }}
+                            />
+                            <FormInput
+                              placeholder="Tool Category"
+                              value={item.toolCategory}
+                              onChange={(e) => {
+                                const newItems = [...toolsData.items];
+                                newItems[index].toolCategory = e.target.value;
+                                setToolsData({...toolsData, items: newItems});
+                              }}
+                            />
+                            <FormSelect
+                              placeholder="Payment Frequency"
+                              options={[
+                                { value: "monthly", label: "Monthly" },
+                                { value: "annually", label: "Annually" },
+                                { value: "one-time", label: "One-Time Payment" },
+                              ]}
+                              value={item.paymentFrequency}
+                              onValueChange={(value) => {
+                                const newItems = [...toolsData.items];
+                                newItems[index].paymentFrequency = value;
+                                setToolsData({...toolsData, items: newItems});
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="grid md:grid-cols-[2fr,1fr,auto] gap-4">
+                            <FormInput
+                              placeholder="Description"
+                              value={item.description}
+                              onChange={(e) => {
+                                const newItems = [...toolsData.items];
+                                newItems[index].description = e.target.value;
+                                setToolsData({...toolsData, items: newItems});
+                              }}
+                            />
+                            <FormInput
+                              type="number"
+                              placeholder="Amount"
+                              value={item.amount}
+                              onChange={(e) => {
+                                const newItems = [...toolsData.items];
+                                newItems[index].amount = e.target.value;
+                                setToolsData({...toolsData, items: newItems});
+                              }}
+                            />
+                            {toolsData.items.length > 1 && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeLineItem("tools", index)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
                     </div>
 
                     <FormSelect
-                      label="Payment Frequency"
-                      required
-                      options={[
-                        { value: "monthly", label: "Monthly" },
-                        { value: "annually", label: "Annually" },
-                        { value: "one-time", label: "One-Time Payment" },
-                      ]}
-                      value={toolsData.paymentFrequency}
-                      onValueChange={(value) => setToolsData({...toolsData, paymentFrequency: value})}
+                      label="Currency"
+                      options={currencyOptions}
+                      value={toolsData.currency}
+                      onValueChange={(value) => setToolsData({...toolsData, currency: value})}
                     />
-
-                    <FormTextarea
-                      label="Description"
-                      required
-                      value={toolsData.description}
-                      onChange={(e) => setToolsData({...toolsData, description: e.target.value})}
-                    />
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Amount"
-                        type="number"
-                        required
-                        value={toolsData.amount}
-                        onChange={(e) => setToolsData({...toolsData, amount: e.target.value})}
-                      />
-                      <FormSelect
-                        label="Currency"
-                        options={currencyOptions}
-                        value={toolsData.currency}
-                        onValueChange={(value) => setToolsData({...toolsData, currency: value})}
-                      />
-                    </div>
 
                     <FormTextarea
                       label="Notes & Payment Method"

@@ -725,55 +725,13 @@ export default function CreateRequest() {
                       onChange={(e) => setOtherWorkData({...otherWorkData, workCategory: e.target.value})}
                     />
 
-                    <div className="space-y-4">
-                      <FormSelect
-                        label="Client/Project Type"
-                        required
-                        placeholder="Select type"
-                        options={clientProjectTypeOptions}
-                        value={otherWorkData.clientProjectType}
-                        onValueChange={(value) => {
-                          setOtherWorkData({
-                            ...otherWorkData, 
-                            clientProjectType: value,
-                            selectedClientProject: "",
-                            customValue: ""
-                          });
-                        }}
-                      />
-                      
-                      {otherWorkData.clientProjectType === "client" && (
-                        <FormSelect
-                          label="Select Client"
-                          required
-                          placeholder="Select client"
-                          options={mockClients}
-                          value={otherWorkData.selectedClientProject}
-                          onValueChange={(value) => setOtherWorkData({...otherWorkData, selectedClientProject: value})}
-                        />
-                      )}
-                      
-                      {otherWorkData.clientProjectType === "project" && (
-                        <FormSelect
-                          label="Select Project"
-                          required
-                          placeholder="Select project"
-                          options={mockProjects}
-                          value={otherWorkData.selectedClientProject}
-                          onValueChange={(value) => setOtherWorkData({...otherWorkData, selectedClientProject: value})}
-                        />
-                      )}
-                      
-                      {otherWorkData.clientProjectType === "other" && (
-                        <FormInput
-                          label="Custom Client/Project"
-                          required
-                          placeholder="Enter custom value"
-                          value={otherWorkData.customValue}
-                          onChange={(e) => setOtherWorkData({...otherWorkData, customValue: e.target.value})}
-                        />
-                      )}
-                    </div>
+                    <FormInput
+                      label="Client/Project Type"
+                      required
+                      placeholder="Enter client or project type"
+                      value={otherWorkData.clientProjectType}
+                      onChange={(e) => setOtherWorkData({...otherWorkData, clientProjectType: e.target.value})}
+                    />
 
                     <FormTextarea
                       label="Description"

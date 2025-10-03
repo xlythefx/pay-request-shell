@@ -47,18 +47,8 @@ export default function Landing() {
     <div className="min-h-screen">
       <BackgroundAnimation />
       
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <img src={logoImage} alt="Feature Digital LTD logo" className="h-10 w-10" />
-            <span className="text-xl font-bold">Feature Digital LTD</span>
-          </div>
-        </div>
-      </header>
-      
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="container mx-auto px-4 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
@@ -66,6 +56,10 @@ export default function Landing() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
+              <div className="flex items-center gap-3 mb-6 animate-pulse">
+                <img src={logoImage} alt="Feature Digital LTD logo" className="h-12 w-12" />
+                <span className="text-2xl md:text-3xl font-bold gradient-text">Feature Digital LTD</span>
+              </div>
               <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
                 <span className="gradient-text">Simplify Your</span>
                 <br />

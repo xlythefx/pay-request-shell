@@ -461,6 +461,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setLinkBuildingData({...linkBuildingData, currency: value})}
                     />
 
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {linkBuildingData.currency} {calculateTotal().toFixed(2)}
+                      </p>
+                    </div>
+
                     <FormTextarea
                       label="Notes & Payment Method"
                       value={linkBuildingData.note}
@@ -574,6 +581,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setSalaryData({...salaryData, currency: value})}
                     />
 
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {salaryData.currency} {calculateTotal().toFixed(2)}
+                      </p>
+                    </div>
+
                     <FormTextarea
                       label="Payment Method / Bank Details"
                       required
@@ -678,6 +692,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setToolsData({...toolsData, currency: value})}
                     />
 
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {toolsData.currency} {calculateTotal().toFixed(2)}
+                      </p>
+                    </div>
+
                     <FormTextarea
                       label="Notes & Payment Method"
                       value={toolsData.note}
@@ -752,6 +773,13 @@ export default function CreateRequest() {
                         value={otherWorkData.currency}
                         onValueChange={(value) => setOtherWorkData({...otherWorkData, currency: value})}
                       />
+                    </div>
+
+                    <div className="p-4 bg-secondary/50 rounded-lg">
+                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
+                      <p className="text-2xl font-bold text-foreground">
+                        {otherWorkData.currency} {calculateTotal().toFixed(2)}
+                      </p>
                     </div>
 
                     <FormTextarea

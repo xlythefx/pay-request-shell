@@ -478,7 +478,7 @@ export default function CreateRequest() {
                 {/* Salary Template */}
                 {template === "salary" && (
                   <>
-                    <div className="grid md:grid-cols-2 gap-4">
+                    <div className="grid md:grid-cols-3 gap-4">
                       <FormSelect
                         label="Employee Name"
                         required
@@ -501,6 +501,13 @@ export default function CreateRequest() {
                         value={salaryData.invoiceNumber}
                         onChange={(e) => setSalaryData({...salaryData, invoiceNumber: e.target.value})}
                       />
+                      <FormInput
+                        label="Date"
+                        type="date"
+                        required
+                        value={salaryData.date}
+                        onChange={(e) => setSalaryData({...salaryData, date: e.target.value})}
+                      />
                     </div>
 
                     <FormInput
@@ -510,21 +517,12 @@ export default function CreateRequest() {
                       onChange={(e) => setSalaryData({...salaryData, employeeAddress: e.target.value})}
                     />
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Employee Position"
-                        required
-                        value={salaryData.position}
-                        onChange={(e) => setSalaryData({...salaryData, position: e.target.value})}
-                      />
-                      <FormInput
-                        label="Date"
-                        type="date"
-                        required
-                        value={salaryData.date}
-                        onChange={(e) => setSalaryData({...salaryData, date: e.target.value})}
-                      />
-                    </div>
+                    <FormInput
+                      label="Employee Position"
+                      required
+                      value={salaryData.position}
+                      onChange={(e) => setSalaryData({...salaryData, position: e.target.value})}
+                    />
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">

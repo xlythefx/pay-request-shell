@@ -12,6 +12,7 @@ import Requests from "./pages/Requests";
 import RequestDetails from "./pages/RequestDetails";
 import DepartmentRequests from "./pages/DepartmentRequests";
 import AdminUsers from "./pages/AdminUsers";
+import SystemSettings from "./pages/SystemSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -70,6 +71,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <AdminUsers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <ProtectedRoute>
+                <SystemSettings />
               </ProtectedRoute>
             }
           />

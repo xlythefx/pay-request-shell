@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, LayoutDashboard, FileText, Users, Menu, X } from "lucide-react";
+import { LogOut, LayoutDashboard, FileText, Users, Menu, X, Settings } from "lucide-react";
 import { getAuth, clearAuth } from "@/lib/auth";
 import { authAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
@@ -46,6 +46,7 @@ export const Navbar = () => {
     { label: "Requests", path: "/requests", icon: FileText, roles: ["employee", "finance_manager", "manager", "admin"] },
     { label: "Department", path: "/department", icon: FileText, roles: ["finance_manager", "manager"] },
     { label: "Users", path: "/admin/users", icon: Users, roles: ["manager", "admin"] },
+    { label: "Settings", path: "/admin/settings", icon: Settings, roles: ["manager", "admin"] },
   ];
 
   const visibleItems = navItems.filter((item) => item.roles.includes(user.role));

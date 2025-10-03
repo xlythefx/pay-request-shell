@@ -117,11 +117,16 @@ export function DataTable<T extends Record<string, any>>({
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="border-b border-border hover:bg-secondary/50 cursor-pointer transition-colors"
+                  className="border-b border-border cursor-pointer group"
                   onClick={() => onRowClick?.(row)}
                 >
-                  {columns.map((column) => (
-                    <TableCell key={column.key} className="text-foreground">
+                  {columns.map((column, colIndex) => (
+                    <TableCell 
+                      key={column.key} 
+                      className={`text-foreground transition-colors ${
+                        colIndex === 0 ? 'group-hover:bg-secondary/50' : ''
+                      }`}
+                    >
                       {column.render ? column.render(row[column.key], row) : row[column.key]}
                     </TableCell>
                   ))}

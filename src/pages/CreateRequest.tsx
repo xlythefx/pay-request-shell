@@ -758,14 +758,13 @@ export default function CreateRequest() {
                       onChange={(e) => setOtherWorkData({...otherWorkData, clientProjectType: e.target.value})}
                     />
 
-                    <FormTextarea
-                      label="Description"
-                      required
-                      value={otherWorkData.description}
-                      onChange={(e) => setOtherWorkData({...otherWorkData, description: e.target.value})}
-                    />
-
                     <div className="grid md:grid-cols-2 gap-4">
+                      <FormInput
+                        label="Description"
+                        required
+                        value={otherWorkData.description}
+                        onChange={(e) => setOtherWorkData({...otherWorkData, description: e.target.value})}
+                      />
                       <FormInput
                         label="Amount"
                         type="number"
@@ -773,13 +772,14 @@ export default function CreateRequest() {
                         value={otherWorkData.amount}
                         onChange={(e) => setOtherWorkData({...otherWorkData, amount: e.target.value})}
                       />
-                      <FormSelect
-                        label="Currency"
-                        options={currencyOptions}
-                        value={otherWorkData.currency}
-                        onValueChange={(value) => setOtherWorkData({...otherWorkData, currency: value})}
-                      />
                     </div>
+
+                    <FormSelect
+                      label="Currency"
+                      options={currencyOptions}
+                      value={otherWorkData.currency}
+                      onValueChange={(value) => setOtherWorkData({...otherWorkData, currency: value})}
+                    />
 
                     <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
                       <div className="flex justify-between items-center">

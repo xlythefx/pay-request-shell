@@ -40,6 +40,8 @@ All colors MUST be HSL.
     --warning: 51 100% 68%; /* Yellow for on hold */
     --error: 0 84% 70%; /* Red for rejected */
 
+    --table-header-hover: 39 60% 48%; /* #C38E32 - Table header hover */
+
     --gradient-start: 172 30% 57%; /* #6FB6AD - Teal */
     --gradient-mid: 46 41% 55%; /* #B5A462 - Gold */
     --gradient-end: 140 19% 60%; /* #83AC8D - Sage */

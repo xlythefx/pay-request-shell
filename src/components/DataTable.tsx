@@ -84,14 +84,14 @@ export function DataTable<T extends Record<string, any>>({
       <div className="rounded-lg border border-border overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-card hover:bg-card">
+            <TableRow className="bg-card hover:bg-[hsl(var(--table-header-hover))]">
               {columns.map((column) => (
                 <TableHead key={column.key} className="text-foreground font-semibold">
                   {column.sortable ? (
                     <Button
                       variant="ghost"
                       onClick={() => handleSort(column.key)}
-                      className="flex items-center gap-2 hover:bg-secondary"
+                      className="flex items-center gap-2 hover:bg-[hsl(var(--table-header-hover))] hover:text-background"
                     >
                       {column.label}
                       <ArrowUpDown className="h-3 w-3" />

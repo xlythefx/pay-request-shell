@@ -461,11 +461,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setLinkBuildingData({...linkBuildingData, currency: value})}
                     />
 
-                    <div className="p-4 bg-secondary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {linkBuildingData.currency} {calculateTotal().toFixed(2)}
-                      </p>
+                    <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-foreground">Total Amount:</span>
+                        <span className="text-2xl font-bold gradient-text">
+                          {calculateTotal().toFixed(2)} {linkBuildingData.currency}
+                        </span>
+                      </div>
                     </div>
 
                     <FormTextarea
@@ -581,11 +583,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setSalaryData({...salaryData, currency: value})}
                     />
 
-                    <div className="p-4 bg-secondary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {salaryData.currency} {calculateTotal().toFixed(2)}
-                      </p>
+                    <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-foreground">Total Amount:</span>
+                        <span className="text-2xl font-bold gradient-text">
+                          {calculateTotal().toFixed(2)} {salaryData.currency}
+                        </span>
+                      </div>
                     </div>
 
                     <FormTextarea
@@ -692,11 +696,13 @@ export default function CreateRequest() {
                       onValueChange={(value) => setToolsData({...toolsData, currency: value})}
                     />
 
-                    <div className="p-4 bg-secondary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {toolsData.currency} {calculateTotal().toFixed(2)}
-                      </p>
+                    <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-foreground">Total Amount:</span>
+                        <span className="text-2xl font-bold gradient-text">
+                          {calculateTotal().toFixed(2)} {toolsData.currency}
+                        </span>
+                      </div>
                     </div>
 
                     <FormTextarea
@@ -775,11 +781,13 @@ export default function CreateRequest() {
                       />
                     </div>
 
-                    <div className="p-4 bg-secondary/50 rounded-lg">
-                      <p className="text-sm text-muted-foreground mb-1">Total Amount</p>
-                      <p className="text-2xl font-bold text-foreground">
-                        {otherWorkData.currency} {calculateTotal().toFixed(2)}
-                      </p>
+                    <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-semibold text-foreground">Total Amount:</span>
+                        <span className="text-2xl font-bold gradient-text">
+                          {calculateTotal().toFixed(2)} {otherWorkData.currency}
+                        </span>
+                      </div>
                     </div>
 
                     <FormTextarea
@@ -795,21 +803,6 @@ export default function CreateRequest() {
                     />
                   </>
                 )}
-
-                {/* Total Amount Display */}
-                <div className="p-4 bg-primary/10 rounded-lg border-2 border-primary/30">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold text-foreground">Total Amount:</span>
-                    <span className="text-2xl font-bold gradient-text">
-                      {calculateTotal().toLocaleString()} {
-                        template === "link_building" ? linkBuildingData.currency :
-                        template === "salary" ? salaryData.currency :
-                        template === "tools" ? toolsData.currency :
-                        otherWorkData.currency
-                      }
-                    </span>
-                  </div>
-                </div>
 
                 <div className="flex gap-4">
                   <Button type="button" variant="outline" onClick={() => setTemplate(null)} className="flex-1">

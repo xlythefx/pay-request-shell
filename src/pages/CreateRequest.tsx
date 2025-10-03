@@ -9,9 +9,10 @@ import { FormInput } from "@/components/FormInput";
 import { FormTextarea } from "@/components/FormTextarea";
 import { FormSelect } from "@/components/FormSelect";
 import { FileUploader } from "@/components/FileUploader";
-import { Plus, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, FileDown } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { generateLinkBuildingPDF, generateSalaryPDF, generateToolsPDF, generateOtherWorkPDF } from "@/lib/pdfGenerator";
 
 type TemplateType = "link_building" | "salary" | "tools" | "other_work";
 
@@ -209,6 +210,30 @@ export default function CreateRequest() {
       return parseFloat(otherWorkData.amount) || 0;
     }
     return 0;
+  };
+
+  const handleGeneratePDF = () => {
+    try {
+      if (template === "link_building") {
+        generateLinkBuildingPDF(linkBuildingData);
+      } else if (template === "salary") {
+        generateSalaryPDF(salaryData);
+      } else if (template === "tools") {
+        generateToolsPDF(toolsData);
+      } else if (template === "other_work") {
+        generateOtherWorkPDF(otherWorkData);
+      }
+      toast({
+        title: "PDF Generated",
+        description: "Your PDF has been downloaded successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "PDF Generation Failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -798,6 +823,10 @@ export default function CreateRequest() {
                 <div className="flex gap-4">
                   <Button type="button" variant="outline" onClick={() => setTemplate(null)} className="flex-1">
                     Cancel
+                  </Button>
+                  <Button type="button" variant="secondary" onClick={handleGeneratePDF} className="flex-1">
+                    <FileDown className="mr-2 h-4 w-4" />
+                    Generate PDF
                   </Button>
                   <Button type="submit" disabled={loading} className="flex-1">
                     {loading ? "Submitting..." : "Submit Request"}

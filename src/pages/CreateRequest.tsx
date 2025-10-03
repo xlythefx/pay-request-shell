@@ -490,6 +490,7 @@ export default function CreateRequest() {
                                 newItems[index].amount = e.target.value;
                                 setLinkBuildingData({...linkBuildingData, items: newItems});
                               }}
+                              error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
                             />
                             {linkBuildingData.items.length > 1 && (
                               <Button
@@ -613,6 +614,7 @@ export default function CreateRequest() {
                               newItems[index].amount = e.target.value;
                               setSalaryData({...salaryData, items: newItems});
                             }}
+                            error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
                           />
                           {salaryData.items.length > 1 && (
                             <Button
@@ -717,6 +719,7 @@ export default function CreateRequest() {
                                 newItems[index].amount = e.target.value;
                                 setToolsData({...toolsData, items: newItems});
                               }}
+                              error={item.amount && parseFloat(item.amount) < 1 ? "Amount must be at least 1" : undefined}
                             />
                             {toolsData.items.length > 1 && (
                               <Button
@@ -817,6 +820,7 @@ export default function CreateRequest() {
                         required
                         value={otherWorkData.amount}
                         onChange={(e) => setOtherWorkData({...otherWorkData, amount: e.target.value})}
+                        error={otherWorkData.amount && parseFloat(otherWorkData.amount) < 1 ? "Amount must be at least 1" : undefined}
                       />
                     </div>
 

@@ -758,13 +758,15 @@ export default function CreateRequest() {
                       onChange={(e) => setOtherWorkData({...otherWorkData, clientProjectType: e.target.value})}
                     />
 
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Description"
-                        required
-                        value={otherWorkData.description}
-                        onChange={(e) => setOtherWorkData({...otherWorkData, description: e.target.value})}
-                      />
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <div className="md:col-span-2">
+                        <FormInput
+                          label="Description"
+                          required
+                          value={otherWorkData.description}
+                          onChange={(e) => setOtherWorkData({...otherWorkData, description: e.target.value})}
+                        />
+                      </div>
                       <FormInput
                         label="Amount"
                         type="number"

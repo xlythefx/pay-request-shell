@@ -363,7 +363,7 @@ export default function CreateRequest() {
                       </div>
                       {linkBuildingData.items.map((item, index) => (
                         <div key={index} className="space-y-4 p-4 bg-secondary/50 rounded-lg">
-                          <div className="grid md:grid-cols-3 gap-4">
+                          <div className="grid md:grid-cols-2 gap-4">
                             <FormSelect
                               placeholder="Select type"
                               options={clientProjectTypeOptions}

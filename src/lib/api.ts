@@ -38,6 +38,7 @@ const mockUsers = [
   { id: 1, name: 'John Doe', email: 'john@example.com', role: 'employee', department: 'Marketing' },
   { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'finance_manager', department: 'Finance' },
   { id: 3, name: 'Admin User', email: 'admin@example.com', role: 'admin', department: 'Management' },
+  { id: 4, name: 'Michael Manager', email: 'manager@example.com', role: 'manager', department: 'Operations' },
 ];
 
 const mockRequests = [

@@ -101,6 +101,7 @@ export default function Login() {
             <div className="space-y-1 text-xs text-muted-foreground">
               <p>Employee: john@example.com / password</p>
               <p>Finance: jane@example.com / password</p>
+              <p>Manager: manager@example.com / password</p>
               <p>Admin: admin@example.com / password</p>
             </div>
           </div>

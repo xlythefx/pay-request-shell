@@ -403,6 +403,7 @@ export default function CreateRequest() {
                         <div key={index} className="space-y-4 p-4 bg-secondary/50 rounded-lg">
                           <div className="grid md:grid-cols-2 gap-4">
                             <FormSelect
+                              label="Type"
                               placeholder="Select type"
                               options={clientProjectTypeOptions}
                               value={item.clientProjectType}
@@ -415,43 +416,59 @@ export default function CreateRequest() {
                               }}
                             />
                             
-                            {item.clientProjectType === "client" && (
-                              <FormSelect
-                                placeholder="Select client"
-                                options={mockClients}
-                                value={item.selectedClientProject}
-                                onValueChange={(value) => {
-                                  const newItems = [...linkBuildingData.items];
-                                  newItems[index].selectedClientProject = value;
-                                  setLinkBuildingData({...linkBuildingData, items: newItems});
-                                }}
-                              />
-                            )}
-                            
-                            {item.clientProjectType === "project" && (
-                              <FormSelect
-                                placeholder="Select project"
-                                options={mockProjects}
-                                value={item.selectedClientProject}
-                                onValueChange={(value) => {
-                                  const newItems = [...linkBuildingData.items];
-                                  newItems[index].selectedClientProject = value;
-                                  setLinkBuildingData({...linkBuildingData, items: newItems});
-                                }}
-                              />
-                            )}
-                            
-                            {item.clientProjectType === "other" && (
-                              <FormInput
-                                placeholder="Enter custom value"
-                                value={item.customValue}
-                                onChange={(e) => {
-                                  const newItems = [...linkBuildingData.items];
-                                  newItems[index].customValue = e.target.value;
-                                  setLinkBuildingData({...linkBuildingData, items: newItems});
-                                }}
-                              />
-                            )}
+                            <div>
+                              {item.clientProjectType === "client" && (
+                                <FormSelect
+                                  label="Client"
+                                  placeholder="Select client"
+                                  options={mockClients}
+                                  value={item.selectedClientProject}
+                                  onValueChange={(value) => {
+                                    const newItems = [...linkBuildingData.items];
+                                    newItems[index].selectedClientProject = value;
+                                    setLinkBuildingData({...linkBuildingData, items: newItems});
+                                  }}
+                                />
+                              )}
+                              
+                              {item.clientProjectType === "project" && (
+                                <FormSelect
+                                  label="Project"
+                                  placeholder="Select project"
+                                  options={mockProjects}
+                                  value={item.selectedClientProject}
+                                  onValueChange={(value) => {
+                                    const newItems = [...linkBuildingData.items];
+                                    newItems[index].selectedClientProject = value;
+                                    setLinkBuildingData({...linkBuildingData, items: newItems});
+                                  }}
+                                />
+                              )}
+                              
+                              {item.clientProjectType === "other" && (
+                                <FormInput
+                                  label="Custom Value"
+                                  placeholder="Enter custom value"
+                                  value={item.customValue}
+                                  onChange={(e) => {
+                                    const newItems = [...linkBuildingData.items];
+                                    newItems[index].customValue = e.target.value;
+                                    setLinkBuildingData({...linkBuildingData, items: newItems});
+                                  }}
+                                />
+                              )}
+                              
+                              {!item.clientProjectType && (
+                                <div className="space-y-2">
+                                  <label className="text-sm font-medium text-muted-foreground">
+                                    Select type first
+                                  </label>
+                                  <div className="h-10 rounded-md border border-dashed border-border bg-muted/50 flex items-center justify-center">
+                                    <span className="text-xs text-muted-foreground">Choose a type above</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
                           </div>
                           
                           <div className="grid md:grid-cols-[2fr,1fr,auto] gap-4">

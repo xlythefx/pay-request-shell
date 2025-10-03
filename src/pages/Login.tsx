@@ -78,7 +78,7 @@ export default function Login() {
               id="password"
               label="Password"
               type="password"
-              placeholder="••••••••"
+              placeholder="password here"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

@@ -188,7 +188,7 @@ export default function SystemSettings() {
           transition={{ delay: 0.2 }}
         >
           <Tabs defaultValue="departments" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6" style={{ backgroundColor: '#C38E32' }}>
               <TabsTrigger value="departments" className="flex items-center gap-2">
                 <Building className="h-4 w-4" />
                 Departments

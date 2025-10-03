@@ -215,13 +215,13 @@ export default function CreateRequest() {
   const handleGeneratePDF = () => {
     try {
       if (template === "link_building") {
-        generateLinkBuildingPDF(linkBuildingData);
+        generateLinkBuildingPDF({ ...linkBuildingData, status: "pending" });
       } else if (template === "salary") {
-        generateSalaryPDF(salaryData);
+        generateSalaryPDF({ ...salaryData, status: "pending" });
       } else if (template === "tools") {
-        generateToolsPDF(toolsData);
+        generateToolsPDF({ ...toolsData, status: "pending" });
       } else if (template === "other_work") {
-        generateOtherWorkPDF(otherWorkData);
+        generateOtherWorkPDF({ ...otherWorkData, status: "pending" });
       }
       toast({
         title: "PDF Generated",

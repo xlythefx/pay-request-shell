@@ -6,6 +6,7 @@ type LinkBuildingData = {
   invoiceNumber: string;
   invoiceDate: string;
   currency: string;
+  status: "approved" | "pending" | "rejected";
   items: Array<{
     clientProjectType: string;
     selectedClientProject: string;
@@ -23,6 +24,7 @@ type SalaryData = {
   invoiceNumber: string;
   date: string;
   currency: string;
+  status: "approved" | "pending" | "rejected";
   items: Array<{ description: string; amount: string }>;
   paymentMethod: string;
 };
@@ -32,6 +34,7 @@ type ToolsData = {
   toolCategory: string;
   paymentFrequency: string;
   currency: string;
+  status: "approved" | "pending" | "rejected";
   items: Array<{ description: string; amount: string }>;
   note: string;
 };
@@ -45,6 +48,7 @@ type OtherWorkData = {
   description: string;
   amount: string;
   currency: string;
+  status: "approved" | "pending" | "rejected";
   note: string;
 };
 
@@ -63,6 +67,24 @@ const addHeader = (doc: jsPDF, title: string) => {
   doc.setFontSize(14);
   doc.setFont(undefined, "normal");
   doc.text(title, 20, 35);
+};
+
+const getStatusLabel = (status: "approved" | "pending" | "rejected"): string => {
+  const statusMap = {
+    approved: "Approved",
+    pending: "On Hold",
+    rejected: "Not Approved",
+  };
+  return statusMap[status];
+};
+
+const getStatusColor = (status: "approved" | "pending" | "rejected"): [number, number, number] => {
+  const colorMap = {
+    approved: [34, 197, 94] as [number, number, number], // green
+    pending: [234, 179, 8] as [number, number, number],  // yellow
+    rejected: [239, 68, 68] as [number, number, number], // red
+  };
+  return colorMap[status];
 };
 
 const addFooter = (doc: jsPDF) => {
@@ -87,8 +109,24 @@ export const generateLinkBuildingPDF = (data: LinkBuildingData) => {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
 
-  // Invoice details
+  // Status badge
   let yPos = 60;
+  const statusColor = getStatusColor(data.status);
+  doc.setFillColor(...statusColor);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont(undefined, "bold");
+  const statusLabel = getStatusLabel(data.status);
+  const statusWidth = doc.getTextWidth(statusLabel) + 10;
+  doc.roundedRect(20, yPos - 5, statusWidth, 8, 2, 2, "F");
+  doc.text(statusLabel, 25, yPos);
+  
+  yPos += 15;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+
+  // Invoice details
   doc.text(`Vendor Name: ${data.vendorName}`, 20, yPos);
   yPos += 10;
   doc.text(`Invoice Number: ${data.invoiceNumber}`, 20, yPos);
@@ -156,8 +194,24 @@ export const generateSalaryPDF = (data: SalaryData) => {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
 
-  // Employee details
+  // Status badge
   let yPos = 60;
+  const statusColor = getStatusColor(data.status);
+  doc.setFillColor(...statusColor);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont(undefined, "bold");
+  const statusLabel = getStatusLabel(data.status);
+  const statusWidth = doc.getTextWidth(statusLabel) + 10;
+  doc.roundedRect(20, yPos - 5, statusWidth, 8, 2, 2, "F");
+  doc.text(statusLabel, 25, yPos);
+  
+  yPos += 15;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+
+  // Employee details
   doc.text(`Employee Name: ${data.employeeName}`, 20, yPos);
   yPos += 10;
   doc.text(`Position: ${data.position}`, 20, yPos);
@@ -221,8 +275,24 @@ export const generateToolsPDF = (data: ToolsData) => {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
 
-  // Tool details
+  // Status badge
   let yPos = 60;
+  const statusColor = getStatusColor(data.status);
+  doc.setFillColor(...statusColor);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont(undefined, "bold");
+  const statusLabel = getStatusLabel(data.status);
+  const statusWidth = doc.getTextWidth(statusLabel) + 10;
+  doc.roundedRect(20, yPos - 5, statusWidth, 8, 2, 2, "F");
+  doc.text(statusLabel, 25, yPos);
+  
+  yPos += 15;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+
+  // Tool details
   doc.text(`Tool Name: ${data.toolName}`, 20, yPos);
   yPos += 10;
   doc.text(`Tool Category: ${data.toolCategory}`, 20, yPos);
@@ -282,8 +352,24 @@ export const generateOtherWorkPDF = (data: OtherWorkData) => {
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(12);
 
-  // Work details
+  // Status badge
   let yPos = 60;
+  const statusColor = getStatusColor(data.status);
+  doc.setFillColor(...statusColor);
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(10);
+  doc.setFont(undefined, "bold");
+  const statusLabel = getStatusLabel(data.status);
+  const statusWidth = doc.getTextWidth(statusLabel) + 10;
+  doc.roundedRect(20, yPos - 5, statusWidth, 8, 2, 2, "F");
+  doc.text(statusLabel, 25, yPos);
+  
+  yPos += 15;
+  doc.setTextColor(0, 0, 0);
+  doc.setFontSize(12);
+  doc.setFont(undefined, "normal");
+
+  // Work details
   doc.text(`Vendor Name: ${data.vendorName}`, 20, yPos);
   yPos += 10;
   doc.text(`Invoice Number: ${data.invoiceNumber}`, 20, yPos);

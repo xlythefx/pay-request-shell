@@ -37,7 +37,7 @@ export const FormSelect = ({
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
           {options.map((option) => (
-            <SelectItem key={option.value} value={option.value} className="focus:bg-secondary">
+            <SelectItem key={option.value} value={option.value} className="focus:bg-primary/20 focus:text-primary">
               {option.label}
             </SelectItem>
           ))}

@@ -7,9 +7,11 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { FormTextarea } from "@/components/FormTextarea";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, FileText } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
+import { getAuth } from "@/lib/auth";
+import { generateDepartmentReportPDF } from "@/lib/pdfGenerator";
 
 export default function DepartmentRequests() {
   const [requests, setRequests] = useState<any[]>([]);
@@ -26,13 +28,47 @@ export default function DepartmentRequests() {
 
   const loadRequests = async () => {
     try {
+      const { user } = getAuth();
       const response = await requestsAPI.getAll();
-      setRequests(response.data || []);
+      // Filter requests by department for finance managers
+      const allRequests = response.data || [];
+      const departmentRequests = user?.department 
+        ? allRequests.filter((req: any) => req.department === user.department)
+        : allRequests;
+      setRequests(departmentRequests);
     } catch (error) {
       console.error("Failed to load requests", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerateReport = () => {
+    const { user } = getAuth();
+    if (!user) return;
+
+    generateDepartmentReportPDF({
+      department: user.department || "Unknown Department",
+      generatedBy: user.name,
+      generatedAt: new Date().toISOString(),
+      companyName: "Digital Payment System",
+      requests: requests.map(req => ({
+        id: req.id,
+        type: req.type,
+        vendorName: req.vendorName,
+        employeeName: req.employeeName,
+        toolName: req.toolName,
+        totalAmount: req.totalAmount,
+        currency: req.currency,
+        status: req.status,
+        createdAt: req.createdAt
+      }))
+    });
+
+    toast({
+      title: "Report generated",
+      description: "Financial report has been downloaded successfully",
+    });
   };
 
   const handleAction = async () => {
@@ -161,10 +197,18 @@ export default function DepartmentRequests() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold mb-2 gradient-text">Department Requests</h1>
-          <p className="text-muted-foreground text-lg">
-            Review and manage payment requests from your department
-          </p>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-4xl font-bold mb-2 gradient-text">Department Requests</h1>
+              <p className="text-muted-foreground text-lg">
+                Review and manage payment requests from your department
+              </p>
+            </div>
+            <Button onClick={handleGenerateReport} disabled={loading || requests.length === 0}>
+              <FileText className="h-4 w-4 mr-2" />
+              Generate Report
+            </Button>
+          </div>
         </motion.div>
 
         <motion.div

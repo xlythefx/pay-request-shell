@@ -61,6 +61,9 @@ export default function CreateRequest() {
   const [template, setTemplate] = useState<TemplateType | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Template notes (for displaying on the right side of template titles)
+  const [templateNote, setTemplateNote] = useState("");
+
   // Link Building & Content Template
   const [linkBuildingData, setLinkBuildingData] = useState({
     vendorName: "",
@@ -347,9 +350,19 @@ export default function CreateRequest() {
         >
           <Card className="glass-effect">
             <CardHeader className={templates.find(t => t.type === template)?.bgColor}>
-              <CardTitle className="text-2xl text-foreground">
-                {templates.find(t => t.type === template)?.title}
-              </CardTitle>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <CardTitle className="text-2xl text-foreground">
+                  {templates.find(t => t.type === template)?.title}
+                </CardTitle>
+                <div className="lg:max-w-md w-full">
+                  <FormInput
+                    placeholder="Add a note for this template..."
+                    value={templateNote}
+                    onChange={(e) => setTemplateNote(e.target.value)}
+                    className="bg-background/50"
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="pt-6">
               <form onSubmit={handleSubmit} className="space-y-6">

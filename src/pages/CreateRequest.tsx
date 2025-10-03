@@ -41,6 +41,14 @@ const mockProjects = [
   { value: "project4", label: "Brand Identity Refresh" },
 ];
 
+const mockEmployees = [
+  { value: "emp1", label: "John Smith", address: "123 Main Street, New York, NY 10001" },
+  { value: "emp2", label: "Sarah Johnson", address: "456 Oak Avenue, Los Angeles, CA 90012" },
+  { value: "emp3", label: "Michael Chen", address: "789 Elm Street, Chicago, IL 60601" },
+  { value: "emp4", label: "Emily Davis", address: "321 Pine Road, Houston, TX 77002" },
+  { value: "emp5", label: "David Wilson", address: "654 Maple Drive, Miami, FL 33101" },
+];
+
 const getTodayDate = () => {
   const today = new Date();
   return today.toISOString().split('T')[0];
@@ -75,7 +83,7 @@ export default function CreateRequest() {
     employeeAddress: "",
     position: "",
     invoiceNumber: "",
-    date: "",
+    date: getTodayDate(),
     currency: "USD",
     items: [{ description: "", amount: "" }],
     paymentMethod: "",
@@ -453,11 +461,20 @@ export default function CreateRequest() {
                 {template === "salary" && (
                   <>
                     <div className="grid md:grid-cols-2 gap-4">
-                      <FormInput
-                        label="Employee Name & Address"
+                      <FormSelect
+                        label="Employee Name"
                         required
+                        placeholder="Select employee"
+                        options={mockEmployees}
                         value={salaryData.employeeName}
-                        onChange={(e) => setSalaryData({...salaryData, employeeName: e.target.value})}
+                        onValueChange={(value) => {
+                          const selectedEmployee = mockEmployees.find(emp => emp.value === value);
+                          setSalaryData({
+                            ...salaryData, 
+                            employeeName: value,
+                            employeeAddress: selectedEmployee?.address || ""
+                          });
+                        }}
                       />
                       <FormInput
                         label="Invoice Number"
@@ -468,19 +485,27 @@ export default function CreateRequest() {
                     </div>
 
                     <FormInput
-                      label="Employee Position"
+                      label="Employee Address"
                       required
-                      value={salaryData.position}
-                      onChange={(e) => setSalaryData({...salaryData, position: e.target.value})}
+                      value={salaryData.employeeAddress}
+                      onChange={(e) => setSalaryData({...salaryData, employeeAddress: e.target.value})}
                     />
 
-                    <FormInput
-                      label="Date"
-                      type="date"
-                      required
-                      value={salaryData.date}
-                      onChange={(e) => setSalaryData({...salaryData, date: e.target.value})}
-                    />
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <FormInput
+                        label="Employee Position"
+                        required
+                        value={salaryData.position}
+                        onChange={(e) => setSalaryData({...salaryData, position: e.target.value})}
+                      />
+                      <FormInput
+                        label="Date"
+                        type="date"
+                        required
+                        value={salaryData.date}
+                        onChange={(e) => setSalaryData({...salaryData, date: e.target.value})}
+                      />
+                    </div>
 
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">

@@ -200,10 +200,12 @@ export default function Dashboard() {
                     View All Requests
                   </Button>
                 </Link>
-                <Button className="w-full justify-start" variant="secondary">
-                  <TrendingUp className="mr-2 h-4 w-4" />
-                  View Analytics
-                </Button>
+                <Link to="/analytics">
+                  <Button className="w-full justify-start" variant="secondary">
+                    <TrendingUp className="mr-2 h-4 w-4" />
+                    View Analytics
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           </motion.div>

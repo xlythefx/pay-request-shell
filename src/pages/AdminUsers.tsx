@@ -34,6 +34,8 @@ export default function AdminUsers() {
     email: "",
     department: "",
     role: "employee",
+    password: "",
+    confirmPassword: "",
   });
   
   const { toast } = useToast();
@@ -86,6 +88,33 @@ export default function AdminUsers() {
       return;
     }
 
+    if (!formData.password) {
+      toast({
+        title: "Validation error",
+        description: "Password is required",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      toast({
+        title: "Validation error",
+        description: "Password must be at least 6 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Validation error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setSubmitting(true);
     try {
       // Mock API call
@@ -118,6 +147,27 @@ export default function AdminUsers() {
         variant: "destructive",
       });
       return;
+    }
+
+    // Validate password only if provided
+    if (formData.password) {
+      if (formData.password.length < 6) {
+        toast({
+          title: "Validation error",
+          description: "Password must be at least 6 characters",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Validation error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     setSubmitting(true);
@@ -165,7 +215,7 @@ export default function AdminUsers() {
   };
 
   const openAddDialog = () => {
-    setFormData({ name: "", email: "", department: "", role: "employee" });
+    setFormData({ name: "", email: "", department: "", role: "employee", password: "", confirmPassword: "" });
     setDialogType("add");
   };
 
@@ -176,6 +226,8 @@ export default function AdminUsers() {
       email: user.email,
       department: user.department || "",
       role: user.role,
+      password: "",
+      confirmPassword: "",
     });
     setDialogType("edit");
   };
@@ -190,7 +242,7 @@ export default function AdminUsers() {
     setSelectedUser(null);
     setNewRole("");
     setDialogType(null);
-    setFormData({ name: "", email: "", department: "", role: "employee" });
+    setFormData({ name: "", email: "", department: "", role: "employee", password: "", confirmPassword: "" });
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -383,6 +435,24 @@ export default function AdminUsers() {
               value={formData.role}
               onValueChange={(value) => setFormData({ ...formData, role: value })}
             />
+            <FormInput
+              id="password"
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+            <FormInput
+              id="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              required
+            />
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={closeDialog} disabled={submitting}>
@@ -431,6 +501,22 @@ export default function AdminUsers() {
               options={roleOptions}
               value={formData.role}
               onValueChange={(value) => setFormData({ ...formData, role: value })}
+            />
+            <FormInput
+              id="password"
+              label="Password (leave blank to keep current)"
+              type="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
+            <FormInput
+              id="confirmPassword"
+              label="Confirm Password"
+              type="password"
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             />
           </div>
           <DialogFooter>

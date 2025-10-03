@@ -92,11 +92,11 @@ export default function CreateRequest() {
 
   // Tools Template
   const [toolsData, setToolsData] = useState({
+    toolName: "",
+    toolCategory: "",
+    paymentFrequency: "",
     currency: "USD",
     items: [{ 
-      toolName: "", 
-      toolCategory: "", 
-      paymentFrequency: "", 
       description: "", 
       amount: "" 
     }],
@@ -172,9 +172,6 @@ export default function CreateRequest() {
       setToolsData({
         ...toolsData,
         items: [...toolsData.items, { 
-          toolName: "", 
-          toolCategory: "", 
-          paymentFrequency: "", 
           description: "", 
           amount: "" 
         }],
@@ -609,6 +606,33 @@ export default function CreateRequest() {
                 {/* Tools Template */}
                 {template === "tools" && (
                   <>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      <FormInput
+                        label="Tool Name"
+                        required
+                        value={toolsData.toolName}
+                        onChange={(e) => setToolsData({...toolsData, toolName: e.target.value})}
+                      />
+                      <FormInput
+                        label="Tool Category"
+                        required
+                        value={toolsData.toolCategory}
+                        onChange={(e) => setToolsData({...toolsData, toolCategory: e.target.value})}
+                      />
+                      <FormSelect
+                        label="Payment Frequency"
+                        required
+                        placeholder="Select frequency"
+                        options={[
+                          { value: "monthly", label: "Monthly" },
+                          { value: "annually", label: "Annually" },
+                          { value: "one-time", label: "One-Time Payment" },
+                        ]}
+                        value={toolsData.paymentFrequency}
+                        onValueChange={(value) => setToolsData({...toolsData, paymentFrequency: value})}
+                      />
+                    </div>
+
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-foreground">Tool Items</h3>
@@ -618,42 +642,7 @@ export default function CreateRequest() {
                         </Button>
                       </div>
                       {toolsData.items.map((item, index) => (
-                        <div key={index} className="space-y-4 p-4 bg-secondary/50 rounded-lg">
-                          <div className="grid md:grid-cols-3 gap-4">
-                            <FormInput
-                              placeholder="Tool Name"
-                              value={item.toolName}
-                              onChange={(e) => {
-                                const newItems = [...toolsData.items];
-                                newItems[index].toolName = e.target.value;
-                                setToolsData({...toolsData, items: newItems});
-                              }}
-                            />
-                            <FormInput
-                              placeholder="Tool Category"
-                              value={item.toolCategory}
-                              onChange={(e) => {
-                                const newItems = [...toolsData.items];
-                                newItems[index].toolCategory = e.target.value;
-                                setToolsData({...toolsData, items: newItems});
-                              }}
-                            />
-                            <FormSelect
-                              placeholder="Payment Frequency"
-                              options={[
-                                { value: "monthly", label: "Monthly" },
-                                { value: "annually", label: "Annually" },
-                                { value: "one-time", label: "One-Time Payment" },
-                              ]}
-                              value={item.paymentFrequency}
-                              onValueChange={(value) => {
-                                const newItems = [...toolsData.items];
-                                newItems[index].paymentFrequency = value;
-                                setToolsData({...toolsData, items: newItems});
-                              }}
-                            />
-                          </div>
-                          
+                        <div key={index} className="p-4 bg-secondary/50 rounded-lg">
                           <div className="grid md:grid-cols-[2fr,1fr,auto] gap-4">
                             <FormInput
                               placeholder="Description"

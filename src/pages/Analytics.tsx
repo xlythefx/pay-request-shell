@@ -4,6 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { BackgroundAnimation } from "@/components/BackgroundAnimation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Dialog,
@@ -24,17 +27,27 @@ import {
   DollarSign,
   BarChart3,
   Calendar,
-  ArrowRight
+  ArrowRight,
+  Search,
+  CalendarIcon,
+  X
 } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function Analytics() {
   const { toast } = useToast();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateRange, setDateRange] = useState<{ from: Date | undefined; to: Date | undefined }>({
+    from: undefined,
+    to: undefined,
+  });
 
   useEffect(() => {
     loadAnalyticsData();
@@ -54,6 +67,7 @@ export default function Analytics() {
           status: "approved",
           department: "IT",
           createdAt: "2024-09-15T10:30:00",
+          updatedAt: "2024-09-20T14:30:00",
           template: "Software",
           description: "Annual software license renewal for project management tools",
           items: [{ description: "Project Management Software - Annual License", amount: 5000 }],
@@ -71,6 +85,7 @@ export default function Analytics() {
           status: "pending",
           department: "Marketing",
           createdAt: "2024-10-02T14:20:00",
+          updatedAt: "2024-10-02T14:20:00",
           template: "Travel",
           description: "Business trip to client meeting in New York",
           items: [
@@ -91,6 +106,7 @@ export default function Analytics() {
           status: "rejected",
           department: "IT",
           createdAt: "2024-08-20T09:15:00",
+          updatedAt: "2024-08-25T16:45:00",
           template: "Software",
           description: "Enterprise cloud hosting upgrade",
           items: [{ description: "Cloud hosting upgrade - 6 months", amount: 8500 }],
@@ -108,6 +124,7 @@ export default function Analytics() {
           status: "approved",
           department: "Design",
           createdAt: "2024-09-30T11:45:00",
+          updatedAt: "2024-10-05T09:20:00",
           template: "Subscription",
           description: "Annual subscription for design team tools",
           items: [{ description: "Adobe Creative Cloud - Team License (5 users)", amount: 2400 }],
@@ -125,6 +142,7 @@ export default function Analytics() {
           status: "approved",
           department: "HR",
           createdAt: "2024-10-10T16:00:00",
+          updatedAt: "2024-10-11T10:15:00",
           template: "Office Supplies",
           description: "Office supplies for new employee onboarding",
           items: [
@@ -145,6 +163,7 @@ export default function Analytics() {
           status: "approved",
           department: "IT",
           createdAt: "2024-07-10T08:30:00",
+          updatedAt: "2024-07-15T11:00:00",
           template: "Software",
           description: "Database management system upgrade and maintenance",
           items: [
@@ -165,6 +184,7 @@ export default function Analytics() {
           status: "pending",
           department: "Sales",
           createdAt: "2024-10-14T13:25:00",
+          updatedAt: "2024-10-14T13:25:00",
           template: "Travel",
           description: "Client meeting in Chicago",
           items: [
@@ -185,6 +205,7 @@ export default function Analytics() {
           status: "approved",
           department: "HR",
           createdAt: "2024-08-05T10:00:00",
+          updatedAt: "2024-08-10T15:30:00",
           template: "Office Supplies",
           description: "New office furniture for expansion",
           items: [
@@ -205,6 +226,7 @@ export default function Analytics() {
           status: "approved",
           department: "IT",
           createdAt: "2024-09-01T09:00:00",
+          updatedAt: "2024-09-05T12:00:00",
           template: "Subscription",
           description: "Annual enterprise communication platform",
           items: [{ description: "Slack Enterprise Grid - Annual", amount: 3600 }],
@@ -222,6 +244,7 @@ export default function Analytics() {
           status: "rejected",
           department: "Marketing",
           createdAt: "2024-10-08T15:30:00",
+          updatedAt: "2024-10-09T09:45:00",
           template: "Office Supplies",
           description: "Marketing materials and office supplies",
           items: [
@@ -242,6 +265,7 @@ export default function Analytics() {
           status: "approved",
           department: "Operations",
           createdAt: "2024-07-25T12:00:00",
+          updatedAt: "2024-07-30T16:20:00",
           template: "Hardware",
           description: "Office security system upgrade",
           items: [
@@ -262,6 +286,7 @@ export default function Analytics() {
           status: "pending",
           department: "Sales",
           createdAt: "2024-10-12T11:15:00",
+          updatedAt: "2024-10-12T11:15:00",
           template: "Travel",
           description: "Trade show attendance in Las Vegas",
           items: [
@@ -283,6 +308,7 @@ export default function Analytics() {
           status: "approved",
           department: "Marketing",
           createdAt: "2024-06-30T14:00:00",
+          updatedAt: "2024-07-05T10:30:00",
           template: "Services",
           description: "Q3 Marketing campaign services",
           items: [
@@ -304,6 +330,7 @@ export default function Analytics() {
           status: "approved",
           department: "IT",
           createdAt: "2024-08-15T10:30:00",
+          updatedAt: "2024-08-20T13:45:00",
           template: "Subscription",
           description: "Annual code repository and collaboration platform",
           items: [{ description: "GitHub Enterprise - 25 users", amount: 2100 }],
@@ -321,6 +348,7 @@ export default function Analytics() {
           status: "approved",
           department: "Design",
           createdAt: "2024-10-01T09:45:00",
+          updatedAt: "2024-10-03T11:20:00",
           template: "Training",
           description: "Professional development - UX Design workshop",
           items: [
@@ -341,6 +369,7 @@ export default function Analytics() {
           status: "approved",
           department: "Operations",
           createdAt: "2024-07-18T16:20:00",
+          updatedAt: "2024-07-22T14:10:00",
           template: "Services",
           description: "Legal consultation and contract review",
           items: [
@@ -361,6 +390,7 @@ export default function Analytics() {
           status: "rejected",
           department: "IT",
           createdAt: "2024-10-09T13:50:00",
+          updatedAt: "2024-10-10T08:30:00",
           template: "Office Supplies",
           description: "Personal equipment upgrade",
           items: [
@@ -381,6 +411,7 @@ export default function Analytics() {
           status: "approved",
           department: "Operations",
           createdAt: "2024-06-15T11:00:00",
+          updatedAt: "2024-06-20T09:15:00",
           template: "Services",
           description: "Annual business insurance premium",
           items: [
@@ -401,6 +432,7 @@ export default function Analytics() {
           status: "pending",
           department: "Marketing",
           createdAt: "2024-10-11T10:20:00",
+          updatedAt: "2024-10-11T10:20:00",
           template: "Travel",
           description: "Marketing conference in San Francisco",
           items: [
@@ -422,6 +454,7 @@ export default function Analytics() {
           status: "approved",
           department: "IT",
           createdAt: "2024-09-20T08:00:00",
+          updatedAt: "2024-09-25T12:30:00",
           template: "Services",
           description: "Quarterly internet and network services",
           items: [{ description: "Business internet - Q4 2024", amount: 1200 }],
@@ -439,17 +472,44 @@ export default function Analytics() {
     }
   };
 
+  // Filter requests based on search query and date range
+  const filteredRequests = requests.filter((request) => {
+    // Search filter
+    const searchLower = searchQuery.toLowerCase();
+    const matchesSearch = !searchQuery || 
+      (request.vendorName && request.vendorName.toLowerCase().includes(searchLower)) ||
+      (request.employeeName && request.employeeName.toLowerCase().includes(searchLower)) ||
+      (request.toolName && request.toolName.toLowerCase().includes(searchLower)) ||
+      (request.invoiceNumber && request.invoiceNumber.toLowerCase().includes(searchLower)) ||
+      (request.department && request.department.toLowerCase().includes(searchLower));
+
+    // Date range filter (based on updatedAt)
+    let matchesDateRange = true;
+    if (dateRange.from || dateRange.to) {
+      const updatedAt = new Date(request.updatedAt);
+      if (dateRange.from && dateRange.to) {
+        matchesDateRange = updatedAt >= dateRange.from && updatedAt <= dateRange.to;
+      } else if (dateRange.from) {
+        matchesDateRange = updatedAt >= dateRange.from;
+      } else if (dateRange.to) {
+        matchesDateRange = updatedAt <= dateRange.to;
+      }
+    }
+
+    return matchesSearch && matchesDateRange;
+  });
+
   // Summary Statistics
   const stats = {
-    total: requests.length,
-    pending: requests.filter((r: any) => r.status === "pending").length,
-    approved: requests.filter((r: any) => r.status === "approved").length,
-    rejected: requests.filter((r: any) => r.status === "rejected").length,
-    totalAmount: requests.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0),
+    total: filteredRequests.length,
+    pending: filteredRequests.filter((r: any) => r.status === "pending").length,
+    approved: filteredRequests.filter((r: any) => r.status === "approved").length,
+    rejected: filteredRequests.filter((r: any) => r.status === "rejected").length,
+    totalAmount: filteredRequests.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0),
   };
 
   // Department Overview
-  const departmentData = requests.reduce((acc: any, req: any) => {
+  const departmentData = filteredRequests.reduce((acc: any, req: any) => {
     const dept = req.department || "Unassigned";
     if (!acc[dept]) {
       acc[dept] = { name: dept, total: 0, approved: 0, pending: 0, rejected: 0 };
@@ -462,12 +522,12 @@ export default function Analytics() {
   const departmentChartData = Object.values(departmentData);
 
   // Top Requests (Largest Payments)
-  const topRequests = [...requests]
+  const topRequests = [...filteredRequests]
     .sort((a, b) => (b.totalAmount || 0) - (a.totalAmount || 0))
     .slice(0, 5);
 
   // Template Usage
-  const templateData = requests.reduce((acc: any, req: any) => {
+  const templateData = filteredRequests.reduce((acc: any, req: any) => {
     const template = req.template || "Other";
     acc[template] = (acc[template] || 0) + 1;
     return acc;
@@ -479,7 +539,7 @@ export default function Analytics() {
   }));
 
   // Monthly Trends (Last 6 months)
-  const monthlyData = requests.reduce((acc: any, req: any) => {
+  const monthlyData = filteredRequests.reduce((acc: any, req: any) => {
     const date = new Date(req.createdAt);
     const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
     if (!acc[monthKey]) {
@@ -598,6 +658,121 @@ export default function Analytics() {
               </Button>
             </div>
           </div>
+        </motion.div>
+
+        {/* Filters Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="mb-8"
+        >
+          <Card className="glass-effect">
+            <CardContent className="pt-6">
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Search Bar */}
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by vendor, employee, invoice, or department..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                  {searchQuery && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+
+                {/* Date Range Picker */}
+                <div className="flex gap-2">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "justify-start text-left font-normal min-w-[240px]",
+                          !dateRange.from && !dateRange.to && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {dateRange.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "MMM dd, yyyy")} - {format(dateRange.to, "MMM dd, yyyy")}
+                            </>
+                          ) : (
+                            format(dateRange.from, "MMM dd, yyyy")
+                          )
+                        ) : (
+                          <span>Filter by date range</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="end">
+                      <div className="p-3">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">From Date</label>
+                            <CalendarComponent
+                              mode="single"
+                              selected={dateRange.from}
+                              onSelect={(date) => setDateRange(prev => ({ ...prev, from: date }))}
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium mb-2 block">To Date</label>
+                            <CalendarComponent
+                              mode="single"
+                              selected={dateRange.to}
+                              onSelect={(date) => setDateRange(prev => ({ ...prev, to: date }))}
+                              disabled={(date) => dateRange.from ? date < dateRange.from : false}
+                              className={cn("p-3 pointer-events-auto")}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+
+                  {(dateRange.from || dateRange.to) && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setDateRange({ from: undefined, to: undefined })}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Active Filters Display */}
+              {(searchQuery || dateRange.from || dateRange.to) && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="text-sm text-muted-foreground">Active filters:</span>
+                  {searchQuery && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-sm">
+                      Search: "{searchQuery}"
+                    </span>
+                  )}
+                  {(dateRange.from || dateRange.to) && (
+                    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-primary/10 text-primary text-sm">
+                      Date: {dateRange.from ? format(dateRange.from, "MMM dd") : "Start"} - {dateRange.to ? format(dateRange.to, "MMM dd, yyyy") : "End"}
+                    </span>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
 
         {/* Tabs for different views */}
@@ -934,7 +1109,7 @@ export default function Analytics() {
               <CardDescription>Requests grouped by status</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
-              {requests.length === 0 ? (
+              {filteredRequests.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No requests yet</p>
               ) : (
                 <div className="flex flex-col lg:flex-row gap-6 min-w-max lg:min-w-0">
@@ -944,11 +1119,11 @@ export default function Analytics() {
                       <CheckCircle className="h-6 w-6 text-success" />
                       <h3 className="text-xl font-bold text-success">Approved</h3>
                       <span className="bg-success/20 text-success px-3 py-1 rounded-full text-sm font-medium">
-                        {requests.filter(r => r.status === 'approved').length}
+                        {filteredRequests.filter(r => r.status === 'approved').length}
                       </span>
                     </div>
                     <div className="space-y-4">
-                      {requests
+                      {filteredRequests
                         .filter(r => r.status === 'approved')
                         .map((request, index) => (
                           <motion.div
@@ -983,7 +1158,7 @@ export default function Analytics() {
                             </div>
                           </motion.div>
                         ))}
-                      {requests.filter(r => r.status === 'approved').length === 0 && (
+                      {filteredRequests.filter(r => r.status === 'approved').length === 0 && (
                         <p className="text-muted-foreground text-center py-8 text-sm">No approved requests</p>
                       )}
                     </div>
@@ -995,11 +1170,11 @@ export default function Analytics() {
                       <Clock className="h-6 w-6 text-warning" />
                       <h3 className="text-xl font-bold text-warning">Pending</h3>
                       <span className="bg-warning/20 text-warning px-3 py-1 rounded-full text-sm font-medium">
-                        {requests.filter(r => r.status === 'pending').length}
+                        {filteredRequests.filter(r => r.status === 'pending').length}
                       </span>
                     </div>
                     <div className="space-y-4">
-                      {requests
+                      {filteredRequests
                         .filter(r => r.status === 'pending')
                         .map((request, index) => (
                           <motion.div
@@ -1034,7 +1209,7 @@ export default function Analytics() {
                             </div>
                           </motion.div>
                         ))}
-                      {requests.filter(r => r.status === 'pending').length === 0 && (
+                      {filteredRequests.filter(r => r.status === 'pending').length === 0 && (
                         <p className="text-muted-foreground text-center py-8 text-sm">No pending requests</p>
                       )}
                     </div>
@@ -1046,11 +1221,11 @@ export default function Analytics() {
                       <XCircle className="h-6 w-6 text-error" />
                       <h3 className="text-xl font-bold text-error">Rejected</h3>
                       <span className="bg-error/20 text-error px-3 py-1 rounded-full text-sm font-medium">
-                        {requests.filter(r => r.status === 'rejected').length}
+                        {filteredRequests.filter(r => r.status === 'rejected').length}
                       </span>
                     </div>
                     <div className="space-y-4">
-                      {requests
+                      {filteredRequests
                         .filter(r => r.status === 'rejected')
                         .map((request, index) => (
                           <motion.div
@@ -1085,7 +1260,7 @@ export default function Analytics() {
                             </div>
                           </motion.div>
                         ))}
-                      {requests.filter(r => r.status === 'rejected').length === 0 && (
+                      {filteredRequests.filter(r => r.status === 'rejected').length === 0 && (
                         <p className="text-muted-foreground text-center py-8 text-sm">No rejected requests</p>
                       )}
                     </div>

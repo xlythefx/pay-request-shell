@@ -5,6 +5,14 @@ import { BackgroundAnimation } from "@/components/BackgroundAnimation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { StatusBadge } from "@/components/StatusBadge";
 import { 
   TrendingUp, 
   Download, 
@@ -26,6 +34,7 @@ export default function Analytics() {
   const { toast } = useToast();
   const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
 
   useEffect(() => {
     loadAnalyticsData();
@@ -560,7 +569,10 @@ export default function Analytics() {
                             : 'bg-warning border-warning'
                         }`} />
                         
-                        <div className="bg-secondary/50 border border-border rounded-lg p-4">
+                        <div 
+                          className="bg-secondary/50 border border-border rounded-lg p-4 cursor-pointer hover:border-primary/50 hover:bg-secondary/70 transition-all"
+                          onClick={() => setSelectedRequest(request)}
+                        >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-1">
@@ -628,6 +640,169 @@ export default function Analytics() {
       </TabsContent>
     </Tabs>
       </div>
+
+      {/* Request Details Dialog */}
+      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto glass-effect">
+          {selectedRequest && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-2xl flex items-center justify-between">
+                  <span>Payment Request #{selectedRequest.id}</span>
+                  <StatusBadge status={selectedRequest.status} />
+                </DialogTitle>
+                <DialogDescription className="capitalize text-base">
+                  {selectedRequest.type.replace("_", " ")} Payment
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-6 pt-4">
+                {/* Basic Info */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-sm text-muted-foreground">Vendor/Employee</label>
+                    <p className="text-lg font-medium text-foreground">
+                      {selectedRequest.vendorName || 
+                       selectedRequest.employeeName || 
+                       selectedRequest.toolName || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Invoice Number</label>
+                    <p className="text-lg font-medium text-foreground">
+                      {selectedRequest.invoiceNumber || "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Department</label>
+                    <p className="text-lg font-medium text-foreground">
+                      {selectedRequest.department || "Unassigned"}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-sm text-muted-foreground">Total Amount</label>
+                    <p className="text-2xl font-bold gradient-text">
+                      ${selectedRequest.totalAmount?.toLocaleString()} {selectedRequest.currency}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Line Items */}
+                {selectedRequest.items && selectedRequest.items.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-4">Line Items</h3>
+                    <div className="space-y-2">
+                      {selectedRequest.items.map((item: any, index: number) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg"
+                        >
+                          <div>
+                            {item.client && (
+                              <p className="text-sm text-muted-foreground">{item.client}</p>
+                            )}
+                            <p className="text-foreground">{item.description}</p>
+                          </div>
+                          <span className="font-semibold text-primary">${item.amount}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Description */}
+                {selectedRequest.description && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Description</label>
+                    <p className="mt-2 text-foreground whitespace-pre-wrap">
+                      {selectedRequest.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Payment Method */}
+                {selectedRequest.paymentMethod && (
+                  <div>
+                    <label className="text-sm text-muted-foreground">Payment Method</label>
+                    <p className="mt-2 text-foreground">{selectedRequest.paymentMethod}</p>
+                  </div>
+                )}
+
+                {/* Manager Note / Comments */}
+                {selectedRequest.managerNote && (
+                  <div className={`p-4 rounded-lg border ${
+                    selectedRequest.status === "approved" 
+                      ? "bg-success/10 border-success/30" 
+                      : selectedRequest.status === "rejected"
+                      ? "bg-error/10 border-error/30"
+                      : "bg-secondary/50 border-border"
+                  }`}>
+                    <label className="text-sm font-semibold text-foreground">
+                      {selectedRequest.status === "approved" && "Approval Comment"}
+                      {selectedRequest.status === "rejected" && "Rejection Reason"}
+                      {selectedRequest.status === "pending" && "Manager Note"}
+                    </label>
+                    <p className="mt-2 text-foreground">{selectedRequest.managerNote}</p>
+                  </div>
+                )}
+
+                {/* Attached Documents */}
+                {selectedRequest.file && (
+                  <div>
+                    <label className="text-sm text-muted-foreground mb-3 block">
+                      Attached Documents
+                    </label>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => {
+                          toast({
+                            title: "View Document",
+                            description: `Opening ${selectedRequest.file}`,
+                          });
+                        }}
+                      >
+                        <FileText className="mr-2 h-4 w-4" />
+                        View {selectedRequest.file}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => {
+                          toast({
+                            title: "Download Started",
+                            description: `Downloading ${selectedRequest.file}`,
+                          });
+                        }}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Metadata */}
+                <div className="pt-4 border-t border-border">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <label className="text-muted-foreground">Created</label>
+                      <p className="text-foreground">
+                        {new Date(selectedRequest.createdAt).toLocaleString()}
+                      </p>
+                    </div>
+                    {selectedRequest.template && (
+                      <div>
+                        <label className="text-muted-foreground">Template Used</label>
+                        <p className="text-foreground">{selectedRequest.template}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

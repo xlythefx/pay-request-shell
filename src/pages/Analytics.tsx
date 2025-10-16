@@ -933,95 +933,128 @@ export default function Analytics() {
               </CardTitle>
               <CardDescription>Chronological view of all request status changes</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {requests.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No requests yet</p>
-                ) : (
-                  [...requests]
-                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-                    .map((request, index) => (
-                      <motion.div
-                        key={request.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05 }}
-                        className="relative pl-8 pb-8 border-l-2 border-border/50 last:border-l-0 last:pb-0"
-                      >
-                        {/* Timeline dot */}
-                        <div className={`absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
-                          request.status === 'approved' 
-                            ? 'bg-success border-success' 
-                            : request.status === 'rejected'
-                            ? 'bg-error border-error'
-                            : 'bg-warning border-warning'
-                        }`} />
-                        
-                        <div 
-                          className="bg-secondary/50 border border-border rounded-lg p-4 cursor-pointer hover:border-primary/50 hover:bg-secondary/70 transition-all"
-                          onClick={() => setSelectedRequest(request)}
+            <CardContent className="overflow-x-auto">
+              {requests.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">No requests yet</p>
+              ) : (
+                <div className="relative">
+                  {/* Horizontal timeline container */}
+                  <div className="flex gap-6 pb-8 min-w-max">
+                    {[...requests]
+                      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                      .map((request, index) => (
+                        <motion.div
+                          key={request.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="relative flex flex-col items-center"
                         >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-foreground">
-                                  {request.vendorName || request.employeeName || request.toolName || "Request"}
-                                </h3>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                  request.status === 'approved' 
-                                    ? 'bg-success/20 text-success' 
-                                    : request.status === 'rejected'
-                                    ? 'bg-error/20 text-error'
-                                    : 'bg-warning/20 text-warning'
-                                }`}>
-                                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                </span>
+                          {/* Timeline card */}
+                          <div 
+                            className="w-72 bg-secondary/50 border border-border rounded-lg p-4 cursor-pointer hover:border-primary/50 hover:bg-secondary/70 hover:scale-105 transition-all mb-6"
+                            onClick={() => setSelectedRequest(request)}
+                          >
+                            <div className="space-y-3">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                    <h3 className="font-semibold text-foreground text-sm">
+                                      {request.vendorName || request.employeeName || request.toolName || "Request"}
+                                    </h3>
+                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                      request.status === 'approved' 
+                                        ? 'bg-success/20 text-success' 
+                                        : request.status === 'rejected'
+                                        ? 'bg-error/20 text-error'
+                                        : 'bg-warning/20 text-warning'
+                                    }`}>
+                                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground">
+                                    {request.invoiceNumber}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {request.department || "Unassigned"}
+                                  </p>
+                                </div>
                               </div>
-                              <p className="text-sm text-muted-foreground">
-                                Invoice: {request.invoiceNumber} • {request.department || "Unassigned"}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <p className="font-bold text-primary text-lg">
-                                ${request.totalAmount?.toLocaleString()}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(request.createdAt).toLocaleDateString()}
-                              </p>
+                              
+                              <div>
+                                <p className="font-bold text-primary text-lg">
+                                  ${request.totalAmount?.toLocaleString()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(request.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                              
+                              {/* Status progression */}
+                              <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+                                <div className="flex items-center gap-1 text-xs">
+                                  <FileText className="h-3 w-3 text-muted-foreground" />
+                                  <span className="text-muted-foreground">Created</span>
+                                </div>
+                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                                <div className="flex items-center gap-1 text-xs">
+                                  {request.status === 'pending' ? (
+                                    <Clock className="h-3 w-3 text-warning" />
+                                  ) : request.status === 'approved' ? (
+                                    <CheckCircle className="h-3 w-3 text-success" />
+                                  ) : (
+                                    <XCircle className="h-3 w-3 text-error" />
+                                  )}
+                                  <span className={
+                                    request.status === 'pending' 
+                                      ? 'text-warning' 
+                                      : request.status === 'approved'
+                                      ? 'text-success'
+                                      : 'text-error'
+                                  }>
+                                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                  </span>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           
-                          {/* Status progression */}
-                          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
-                            <div className="flex items-center gap-1 text-xs">
-                              <FileText className="h-3 w-3 text-muted-foreground" />
-                              <span className="text-muted-foreground">Created</span>
-                            </div>
-                            <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                            <div className="flex items-center gap-1 text-xs">
-                              {request.status === 'pending' ? (
-                                <Clock className="h-3 w-3 text-warning" />
-                              ) : request.status === 'approved' ? (
-                                <CheckCircle className="h-3 w-3 text-success" />
-                              ) : (
-                                <XCircle className="h-3 w-3 text-error" />
-                              )}
-                              <span className={
-                                request.status === 'pending' 
-                                  ? 'text-warning' 
-                                  : request.status === 'approved'
-                                  ? 'text-success'
-                                  : 'text-error'
-                              }>
-                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                              </span>
-                            </div>
+                          {/* Timeline dot and line */}
+                          <div className="relative flex items-center">
+                            <div className={`w-6 h-6 rounded-full border-4 z-10 ${
+                              request.status === 'approved' 
+                                ? 'bg-success border-success shadow-lg shadow-success/50' 
+                                : request.status === 'rejected'
+                                ? 'bg-error border-error shadow-lg shadow-error/50'
+                                : 'bg-warning border-warning shadow-lg shadow-warning/50'
+                            }`} />
+                            
+                            {/* Connecting line to next item */}
+                            {index < requests.length - 1 && (
+                              <div className="absolute left-6 w-24 h-1 bg-gradient-to-r from-primary/50 to-primary/20" />
+                            )}
                           </div>
-                        </div>
-                      </motion.div>
-                    ))
-                )}
-              </div>
+                          
+                          {/* Date label below timeline */}
+                          <div className="mt-4 text-center">
+                            <p className="text-xs font-medium text-foreground">
+                              {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(request.createdAt).toLocaleDateString('en-US', { year: 'numeric' })}
+                            </p>
+                          </div>
+                        </motion.div>
+                      ))}
+                  </div>
+                  
+                  {/* Scroll indicator for mobile */}
+                  <div className="md:hidden flex justify-center gap-2 mt-4">
+                    <div className="h-1 w-20 bg-primary/30 rounded-full" />
+                    <p className="text-xs text-muted-foreground">Scroll horizontally →</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>

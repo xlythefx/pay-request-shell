@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { BackgroundAnimation } from "@/components/BackgroundAnimation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   TrendingUp, 
   Download, 
@@ -14,7 +15,8 @@ import {
   Building,
   DollarSign,
   BarChart3,
-  Calendar
+  Calendar,
+  ArrowRight
 } from "lucide-react";
 import { requestsAPI } from "@/lib/api";
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
@@ -201,14 +203,21 @@ export default function Analytics() {
           </div>
         </motion.div>
 
-        {/* Summary Dashboard */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <h2 className="text-2xl font-semibold mb-4 text-foreground">Summary Dashboard</h2>
+        {/* Tabs for different views */}
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="glass-effect">
+            <TabsTrigger value="overview" className="border border-border/50">Overview</TabsTrigger>
+            <TabsTrigger value="timeline" className="border border-border/50">Timeline</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-8">
+            {/* Summary Dashboard */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <h2 className="text-2xl font-semibold mb-4 text-foreground">Summary Dashboard</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {statCards.map((stat, index) => {
               const Icon = stat.icon;
@@ -512,6 +521,112 @@ export default function Analytics() {
             </CardContent>
           </Card>
         </motion.div>
+      </TabsContent>
+
+      <TabsContent value="timeline" className="space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="glass-effect">
+            <CardHeader>
+              <CardTitle className="text-foreground flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Request Status Timeline
+              </CardTitle>
+              <CardDescription>Chronological view of all request status changes</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {requests.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-8">No requests yet</p>
+                ) : (
+                  [...requests]
+                    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                    .map((request, index) => (
+                      <motion.div
+                        key={request.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="relative pl-8 pb-8 border-l-2 border-border/50 last:border-l-0 last:pb-0"
+                      >
+                        {/* Timeline dot */}
+                        <div className={`absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
+                          request.status === 'approved' 
+                            ? 'bg-success border-success' 
+                            : request.status === 'rejected'
+                            ? 'bg-error border-error'
+                            : 'bg-warning border-warning'
+                        }`} />
+                        
+                        <div className="bg-secondary/50 border border-border rounded-lg p-4">
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h3 className="font-semibold text-foreground">
+                                  {request.vendorName || request.employeeName || request.toolName || "Request"}
+                                </h3>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                  request.status === 'approved' 
+                                    ? 'bg-success/20 text-success' 
+                                    : request.status === 'rejected'
+                                    ? 'bg-error/20 text-error'
+                                    : 'bg-warning/20 text-warning'
+                                }`}>
+                                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                </span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                Invoice: {request.invoiceNumber} • {request.department || "Unassigned"}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-bold text-primary text-lg">
+                                ${request.totalAmount?.toLocaleString()}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(request.createdAt).toLocaleDateString()}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Status progression */}
+                          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-border/50">
+                            <div className="flex items-center gap-1 text-xs">
+                              <FileText className="h-3 w-3 text-muted-foreground" />
+                              <span className="text-muted-foreground">Created</span>
+                            </div>
+                            <ArrowRight className="h-3 w-3 text-muted-foreground" />
+                            <div className="flex items-center gap-1 text-xs">
+                              {request.status === 'pending' ? (
+                                <Clock className="h-3 w-3 text-warning" />
+                              ) : request.status === 'approved' ? (
+                                <CheckCircle className="h-3 w-3 text-success" />
+                              ) : (
+                                <XCircle className="h-3 w-3 text-error" />
+                              )}
+                              <span className={
+                                request.status === 'pending' 
+                                  ? 'text-warning' 
+                                  : request.status === 'approved'
+                                  ? 'text-success'
+                                  : 'text-error'
+                              }>
+                                {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </TabsContent>
+    </Tabs>
       </div>
     </div>
   );

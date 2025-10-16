@@ -931,127 +931,164 @@ export default function Analytics() {
                 <Clock className="h-5 w-5 text-primary" />
                 Request Status Timeline
               </CardTitle>
-              <CardDescription>Chronological view of all request status changes</CardDescription>
+              <CardDescription>Requests grouped by status</CardDescription>
             </CardHeader>
             <CardContent className="overflow-x-auto">
               {requests.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">No requests yet</p>
               ) : (
-                <div className="relative">
-                  {/* Horizontal timeline container */}
-                  <div className="flex gap-6 pb-8 min-w-max">
-                    {[...requests]
-                      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-                      .map((request, index) => (
-                        <motion.div
-                          key={request.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.05 }}
-                          className="relative flex flex-col items-center"
-                        >
-                          {/* Timeline card */}
-                          <div 
-                            className="w-72 bg-secondary/50 border border-border rounded-lg p-4 cursor-pointer hover:border-primary/50 hover:bg-secondary/70 hover:scale-105 transition-all mb-6"
+                <div className="flex flex-col lg:flex-row gap-6 min-w-max lg:min-w-0">
+                  {/* Approved Column */}
+                  <div className="flex-1 min-w-[300px]">
+                    <div className="flex items-center justify-center gap-2 mb-6 pb-4 border-b-4 border-success">
+                      <CheckCircle className="h-6 w-6 text-success" />
+                      <h3 className="text-xl font-bold text-success">Approved</h3>
+                      <span className="bg-success/20 text-success px-3 py-1 rounded-full text-sm font-medium">
+                        {requests.filter(r => r.status === 'approved').length}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      {requests
+                        .filter(r => r.status === 'approved')
+                        .map((request, index) => (
+                          <motion.div
+                            key={request.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="bg-secondary/50 border border-border hover:border-success/50 rounded-lg p-4 cursor-pointer hover:bg-secondary/70 transition-all"
                             onClick={() => setSelectedRequest(request)}
                           >
                             <div className="space-y-3">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                    <h3 className="font-semibold text-foreground text-sm">
-                                      {request.vendorName || request.employeeName || request.toolName || "Request"}
-                                    </h3>
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                                      request.status === 'approved' 
-                                        ? 'bg-success/20 text-success' 
-                                        : request.status === 'rejected'
-                                        ? 'bg-error/20 text-error'
-                                        : 'bg-warning/20 text-warning'
-                                    }`}>
-                                      {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                    </span>
-                                  </div>
-                                  <p className="text-xs text-muted-foreground">
-                                    {request.invoiceNumber}
-                                  </p>
-                                  <p className="text-xs text-muted-foreground">
-                                    {request.department || "Unassigned"}
-                                  </p>
-                                </div>
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="font-semibold text-foreground text-sm">
+                                  {request.vendorName || request.employeeName || request.toolName || "Request"}
+                                </h4>
+                                <div className="h-3 w-3 rounded-full bg-success shadow-lg shadow-success/50 flex-shrink-0 mt-1" />
                               </div>
-                              
-                              <div>
-                                <p className="font-bold text-primary text-lg">
+                              <p className="text-xs text-muted-foreground">
+                                {request.invoiceNumber}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {request.department || "Unassigned"}
+                              </p>
+                              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <p className="font-bold text-success text-lg">
                                   ${request.totalAmount?.toLocaleString()}
                                 </p>
                                 <p className="text-xs text-muted-foreground">
-                                  {new Date(request.createdAt).toLocaleDateString()}
+                                  {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                                 </p>
                               </div>
-                              
-                              {/* Status progression */}
-                              <div className="flex items-center gap-2 pt-2 border-t border-border/50">
-                                <div className="flex items-center gap-1 text-xs">
-                                  <FileText className="h-3 w-3 text-muted-foreground" />
-                                  <span className="text-muted-foreground">Created</span>
-                                </div>
-                                <ArrowRight className="h-3 w-3 text-muted-foreground" />
-                                <div className="flex items-center gap-1 text-xs">
-                                  {request.status === 'pending' ? (
-                                    <Clock className="h-3 w-3 text-warning" />
-                                  ) : request.status === 'approved' ? (
-                                    <CheckCircle className="h-3 w-3 text-success" />
-                                  ) : (
-                                    <XCircle className="h-3 w-3 text-error" />
-                                  )}
-                                  <span className={
-                                    request.status === 'pending' 
-                                      ? 'text-warning' 
-                                      : request.status === 'approved'
-                                      ? 'text-success'
-                                      : 'text-error'
-                                  }>
-                                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                                  </span>
-                                </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      {requests.filter(r => r.status === 'approved').length === 0 && (
+                        <p className="text-muted-foreground text-center py-8 text-sm">No approved requests</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Pending Column */}
+                  <div className="flex-1 min-w-[300px]">
+                    <div className="flex items-center justify-center gap-2 mb-6 pb-4 border-b-4 border-warning">
+                      <Clock className="h-6 w-6 text-warning" />
+                      <h3 className="text-xl font-bold text-warning">Pending</h3>
+                      <span className="bg-warning/20 text-warning px-3 py-1 rounded-full text-sm font-medium">
+                        {requests.filter(r => r.status === 'pending').length}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      {requests
+                        .filter(r => r.status === 'pending')
+                        .map((request, index) => (
+                          <motion.div
+                            key={request.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="bg-secondary/50 border border-border hover:border-warning/50 rounded-lg p-4 cursor-pointer hover:bg-secondary/70 transition-all"
+                            onClick={() => setSelectedRequest(request)}
+                          >
+                            <div className="space-y-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="font-semibold text-foreground text-sm">
+                                  {request.vendorName || request.employeeName || request.toolName || "Request"}
+                                </h4>
+                                <div className="h-3 w-3 rounded-full bg-warning shadow-lg shadow-warning/50 flex-shrink-0 mt-1" />
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {request.invoiceNumber}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {request.department || "Unassigned"}
+                              </p>
+                              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <p className="font-bold text-warning text-lg">
+                                  ${request.totalAmount?.toLocaleString()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </p>
                               </div>
                             </div>
-                          </div>
-                          
-                          {/* Timeline dot and line */}
-                          <div className="relative flex items-center">
-                            <div className={`w-6 h-6 rounded-full border-4 z-10 ${
-                              request.status === 'approved' 
-                                ? 'bg-success border-success shadow-lg shadow-success/50' 
-                                : request.status === 'rejected'
-                                ? 'bg-error border-error shadow-lg shadow-error/50'
-                                : 'bg-warning border-warning shadow-lg shadow-warning/50'
-                            }`} />
-                            
-                            {/* Connecting line to next item */}
-                            {index < requests.length - 1 && (
-                              <div className="absolute left-6 w-24 h-1 bg-gradient-to-r from-primary/50 to-primary/20" />
-                            )}
-                          </div>
-                          
-                          {/* Date label below timeline */}
-                          <div className="mt-4 text-center">
-                            <p className="text-xs font-medium text-foreground">
-                              {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(request.createdAt).toLocaleDateString('en-US', { year: 'numeric' })}
-                            </p>
-                          </div>
-                        </motion.div>
-                      ))}
+                          </motion.div>
+                        ))}
+                      {requests.filter(r => r.status === 'pending').length === 0 && (
+                        <p className="text-muted-foreground text-center py-8 text-sm">No pending requests</p>
+                      )}
+                    </div>
                   </div>
-                  
-                  {/* Scroll indicator for mobile */}
-                  <div className="md:hidden flex justify-center gap-2 mt-4">
-                    <div className="h-1 w-20 bg-primary/30 rounded-full" />
-                    <p className="text-xs text-muted-foreground">Scroll horizontally →</p>
+
+                  {/* Rejected Column */}
+                  <div className="flex-1 min-w-[300px]">
+                    <div className="flex items-center justify-center gap-2 mb-6 pb-4 border-b-4 border-error">
+                      <XCircle className="h-6 w-6 text-error" />
+                      <h3 className="text-xl font-bold text-error">Rejected</h3>
+                      <span className="bg-error/20 text-error px-3 py-1 rounded-full text-sm font-medium">
+                        {requests.filter(r => r.status === 'rejected').length}
+                      </span>
+                    </div>
+                    <div className="space-y-4">
+                      {requests
+                        .filter(r => r.status === 'rejected')
+                        .map((request, index) => (
+                          <motion.div
+                            key={request.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.05 }}
+                            className="bg-secondary/50 border border-border hover:border-error/50 rounded-lg p-4 cursor-pointer hover:bg-secondary/70 transition-all"
+                            onClick={() => setSelectedRequest(request)}
+                          >
+                            <div className="space-y-3">
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="font-semibold text-foreground text-sm">
+                                  {request.vendorName || request.employeeName || request.toolName || "Request"}
+                                </h4>
+                                <div className="h-3 w-3 rounded-full bg-error shadow-lg shadow-error/50 flex-shrink-0 mt-1" />
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {request.invoiceNumber}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {request.department || "Unassigned"}
+                              </p>
+                              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <p className="font-bold text-error text-lg">
+                                  ${request.totalAmount?.toLocaleString()}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(request.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      {requests.filter(r => r.status === 'rejected').length === 0 && (
+                        <p className="text-muted-foreground text-center py-8 text-sm">No rejected requests</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
